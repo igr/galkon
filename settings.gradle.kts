@@ -1,3 +1,3 @@
 rootProject.name = "galkon"
 
-include("common", "server", "client")
+include("common", "game", "server", "client")

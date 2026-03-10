@@ -1,6 +1,6 @@
 plugins {
-    kotlin("jvm")
-    kotlin("plugin.serialization")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.serialization)
     application
 }
 
@@ -8,16 +8,33 @@ application {
     mainClass.set("galkon.server.MainKt")
 }
 
-val ktorVersion = "3.0.3"
+val generateVersion by tasks.registering {
+    val outputDir = layout.buildDirectory.dir("generated-resources/version")
+    val versionFile = outputDir.map { it.file("version.txt") }
+    outputs.dir(outputDir)
+    doLast {
+        val sha = providers.exec { commandLine("git", "rev-parse", "--short", "HEAD") }
+            .standardOutput.asText.get().trim()
+        versionFile.get().asFile.apply {
+            parentFile.mkdirs()
+            writeText(sha)
+        }
+    }
+}
+
+sourceSets.main {
+    resources.srcDir(generateVersion)
+}
 
 dependencies {
-    implementation(project(":common"))
-    implementation("io.ktor:ktor-server-netty:$ktorVersion")
-    implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
-    implementation("io.ktor:ktor-server-cors:$ktorVersion")
-    implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
-    implementation("ch.qos.logback:logback-classic:1.5.12")
+    implementation(project(":game"))
+    implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.server.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.ktor.server.cors)
+    implementation(libs.ktor.server.status.pages)
+    implementation(libs.ktor.server.html.builder)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.logback.classic)
 }

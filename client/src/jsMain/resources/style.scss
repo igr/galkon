@@ -1,0 +1,341 @@
+$accent: #00ff88;
+$accent-hover: #00cc66;
+$bg-dark: #0a0a2e;
+$bg-panel: #1a1a4e;
+$bg-galaxy: #0d0d35;
+$text: #e0e0e0;
+$text-muted: #aaa;
+$text-dim: #888;
+$border: #333;
+$border-light: #555;
+$danger: #ff4444;
+$warn: #ffaa00;
+$info: #00aaff;
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: $bg-dark;
+    color: $text;
+    font-family: 'Courier New', monospace;
+    min-height: 100vh;
+}
+
+#app {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 10px;
+}
+
+/* Header */
+.header {
+    background: $bg-panel;
+    padding: 10px 20px;
+    border-bottom: 2px solid $accent;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+
+    h1 { color: $accent; font-size: 1.2em; }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .turn-info { color: $text-muted; }
+
+    .menu-wrapper {
+        position: relative;
+
+        .menu-btn {
+            background: none;
+            border: 1px solid $border-light;
+            color: $text;
+            font-size: 1.4em;
+            padding: 2px 8px;
+            cursor: pointer;
+            line-height: 1;
+
+            &:hover { border-color: $accent; color: $accent; }
+        }
+
+        .menu-dropdown {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: 4px;
+            background: $bg-panel;
+            border: 1px solid $border-light;
+            min-width: 140px;
+            z-index: 10;
+
+            .menu-item {
+                padding: 8px 12px;
+                cursor: pointer;
+                color: $text;
+
+                &:hover { background: $border; color: $accent; }
+            }
+        }
+    }
+}
+
+/* Lobby */
+.lobby {
+    max-width: 500px;
+    margin: 50px auto;
+    text-align: center;
+
+    h1 { color: $accent; font-size: 2em; margin-bottom: 30px; }
+
+    .section {
+        background: $bg-panel;
+        padding: 20px;
+        margin-bottom: 15px;
+        border: 1px solid $border;
+
+        h2 { color: $accent; font-size: 1em; margin-bottom: 10px; }
+    }
+
+    input {
+        background: $bg-dark;
+        color: $text;
+        border: 1px solid $border-light;
+        padding: 8px 12px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9em;
+        width: 100%;
+        margin-bottom: 10px;
+
+        &:focus { outline: none; border-color: $accent; }
+    }
+
+    button { @extend %btn; }
+}
+
+%btn {
+    background: $accent;
+    color: $bg-dark;
+    border: none;
+    padding: 8px 16px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    cursor: pointer;
+    font-weight: bold;
+
+    &:hover { background: $accent-hover; }
+    &:disabled { background: $border-light; color: $text-dim; cursor: not-allowed; }
+}
+
+.game button { @extend %btn; }
+
+.game-code {
+    font-size: 2em;
+    color: $accent;
+    letter-spacing: 4px;
+    margin: 10px 0;
+}
+
+.player-list {
+    text-align: left;
+    margin: 10px 0;
+
+    div { padding: 4px 0; color: $text-muted; }
+}
+
+.error {
+    color: $danger;
+    margin: 10px 0;
+    font-size: 0.9em;
+}
+
+/* Game layout */
+.game {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    grid-template-rows: auto 1fr auto auto;
+    gap: 10px;
+    height: calc(100vh - 30px);
+
+    .header { grid-column: 1 / -1; }
+}
+
+/* Galaxy map */
+.galaxy {
+    background: $bg-galaxy;
+    border: 1px solid $border;
+    grid-row: 2;
+    grid-column: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    svg { width: 100%; flex: 1; min-height: 0; }
+
+    .seed-display {
+        text-align: center;
+        color: $border-light;
+        font-size: 0.7em;
+        padding: 2px 0;
+    }
+}
+
+/* Sidebar */
+.sidebar {
+    grid-row: 2;
+    grid-column: 2;
+    background: $bg-panel;
+    border: 1px solid $border;
+    padding: 10px;
+    overflow-y: auto;
+    font-size: 0.85em;
+
+    h3 {
+        color: $accent;
+        font-size: 0.95em;
+        margin: 10px 0 5px 0;
+        border-bottom: 1px solid $border;
+        padding-bottom: 3px;
+    }
+
+    .planet-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 2px 0;
+        color: $text-muted;
+
+        .label { font-weight: bold; width: 20px; }
+
+        &.mine { color: $text; .label { color: $accent; } }
+        &.enemy { color: #cc8888; .label { color: $danger; } }
+        &.neutral { color: $text-dim; .label { color: $text-dim; } }
+    }
+
+    .fleet-row { padding: 2px 0; color: $text-muted; }
+}
+
+/* Orders panel */
+.orders {
+    grid-column: 1 / -1;
+    background: $bg-panel;
+    border: 1px solid $border;
+    padding: 10px;
+
+    .inputs {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    input {
+        background: $bg-dark;
+        color: $text;
+        border: 1px solid $border-light;
+        padding: 6px 10px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9em;
+        width: 80px;
+
+        &:focus { outline: none; border-color: $accent; }
+    }
+
+    .queue {
+        margin-top: 8px;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .queue-item {
+        background: $bg-dark;
+        padding: 4px 8px;
+        border: 1px solid $border-light;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        .remove { color: $danger; cursor: pointer; font-weight: bold; }
+    }
+
+    .waiting { color: $text-dim; font-style: italic; }
+}
+
+/* Setup vote bar */
+.setup-vote {
+    grid-column: 1 / -1;
+    background: $bg-panel;
+    border: 1px solid $border;
+    padding: 15px;
+    text-align: center;
+
+    .vote-prompt {
+        margin-bottom: 12px;
+        .warn { color: $warn; font-size: 0.85em; }
+    }
+
+    .vote-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .btn-agree { @extend %btn; }
+    .btn-disagree {
+        @extend %btn;
+        background: $danger;
+        &:hover { background: darken($danger, 10%); }
+    }
+
+    .waiting { color: $text-dim; font-style: italic; }
+}
+
+/* Event log */
+.events {
+    grid-column: 1 / -1;
+    background: $bg-panel;
+    border: 1px solid $border;
+    padding: 10px;
+    max-height: 150px;
+    overflow-y: auto;
+    font-size: 0.85em;
+
+    h3 { color: $accent; margin-bottom: 5px; }
+
+    .event {
+        padding: 2px 0;
+
+        &.good { color: $accent; }
+        &.bad { color: $danger; }
+        &.warn { color: $warn; }
+        &.neutral-event { color: $text-muted; }
+        &.turn-marker {
+            color: $info;
+            font-weight: bold;
+            border-top: 1px solid $border;
+            margin-top: 4px;
+            padding-top: 4px;
+        }
+    }
+}
+
+/* Scores */
+.scores {
+    max-width: 700px;
+    margin: 50px auto;
+    text-align: center;
+
+    h1 { color: $accent; font-size: 1.5em; margin-bottom: 20px; }
+
+    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    th { color: $accent; border-bottom: 2px solid $accent; padding: 8px; text-align: left; }
+    td { padding: 8px; border-bottom: 1px solid $border; }
+    tr:first-child td { color: $accent; font-weight: bold; }
+}

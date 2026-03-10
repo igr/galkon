@@ -1,0 +1,3 @@
+config.performance = {
+    hints: false
+};
