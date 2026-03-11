@@ -23,8 +23,18 @@ data class GameState(
             else -> 0
         }
 
+    fun findPlanetById(id: PlanetId): Planet? = planets.find { it.label == id }
+
+    inline fun forEachOrder(action: (PlayerId, FleetOrder) -> Unit) {
+        for ((playerId, playerOrders) in orders) {
+            for (order in playerOrders) {
+                action(playerId, order)
+            }
+        }
+    }
+
     companion object {
-        fun lobby(config: GameConfig) = GameState(
+        fun phaseLobby(config: GameConfig) = GameState(
             config = config,
             phase = GamePhase.Lobby,
             planets = mutableListOf(),
@@ -39,7 +49,7 @@ data class GameState(
 }
 
 /** Generate universe and enter the SetUp voting phase. */
-fun transitionGameToSetUp(config: GameConfig, players: Map<PlayerId, PlayerInfo>, round: Int = 1): GameState {
+fun phaseGameToSetUp(config: GameConfig, players: Map<PlayerId, PlayerInfo>, round: Int = 1): GameState {
     val planets = generateUniverse(config, players.keys.toList())
     return GameState(
         config = config,
@@ -55,23 +65,7 @@ fun transitionGameToSetUp(config: GameConfig, players: Map<PlayerId, PlayerInfo>
 }
 
 /** Transition from SetUp to InProgress, keeping the current galaxy. */
-fun transitionSetUpToInProgress(state: GameState) {
+fun phaseSetUpToInProgress(state: GameState) {
     state.phase = GamePhase.InProgress(1)
     state.setupVotes.clear()
-}
-
-/** Create the initial game state from config and players. */
-fun transitionGameToInProgress(config: GameConfig, players: Map<PlayerId, PlayerInfo>): GameState {
-    val planets = generateUniverse(config, players.keys.toList())
-    return GameState(
-        config = config,
-        phase = GamePhase.InProgress(1),
-        planets = planets.toMutableList(),
-        fleets = mutableListOf(),
-        players = players.toMutableMap(),
-        orders = mutableMapOf(),
-        turnEvents = mutableListOf(),
-        eliminated = mutableListOf(),
-        visited = mutableMapOf(),
-    )
 }

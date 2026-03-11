@@ -10,7 +10,7 @@ fun resolveTurn(state: GameState) {
     resolveArrivals(state)
     resolveProduction(state)
     updateEliminations(state)
-    updateGamePhase(state)
+    updateGameInProgressPhase(state)
 
     state.orders.clear()
 }
@@ -20,27 +20,23 @@ private fun initTurn(state: GameState) {
     state.turnEvents.add(TurnEvent.TurnStarted(state.currentTurn))
 }
 
-private fun updateGamePhase(state: GameState) {
-    val activePlayers = state.players.keys
-    val eliminated = state.eliminated
-    val remaining = activePlayers.filter { it !in eliminated }
+private fun updateGameInProgressPhase(state: GameState) {
     val currentTurn = state.currentTurn
     when {
-        remaining.size <= 1 -> {
+        state.hasOneOrNoPlayersLeft() -> {
             state.phase = GamePhase.Finished
         }
-
-        currentTurn >= state.config.numTurns -> {
+        state.hasReachedTurnLimit() -> {
             // End-game fleet resolution before finishing
             resolveEndGame(state)
             state.phase = GamePhase.Finished
         }
-
         else -> {
             state.phase = GamePhase.InProgress(currentTurn + 1)
         }
     }
 }
+
 
 private fun updateEliminations(state: GameState) {
     val activePlayers = state.players.keys
@@ -54,26 +50,25 @@ private fun updateEliminations(state: GameState) {
 }
 
 private fun launchFleets(state: GameState) {
-    for ((playerId, playerOrders) in state.orders) {
-        for (order in playerOrders) {
-            val origin = state.planets.find { it.label == order.from } ?: continue
-            val target = state.planets.find { it.label == order.to } ?: continue
+    state.forEachOrder { playerId, order ->
+        val origin = state.findPlanetById(order.from) ?: return@forEachOrder
+        val target = state.findPlanetById(order.to) ?: return@forEachOrder
 
-            if (origin.owner != Owner.Player(playerId) || origin.ships < order.ships || order.ships.none) continue
+        if (!playerId.canLaunchShipsFrom(origin, order.ships)) return@forEachOrder
 
-            val dist = distance(origin, target)
-            val fleet = Fleet(
-                owner = playerId,
-                ships = order.ships,
-                killRatio = origin.killRatio,
-                from = order.from,
-                to = order.to,
-                distanceRemaining = dist,
-            )
-            state.fleets.add(fleet)
-            state.planets.update(order.from) { it.copy(ships = it.ships - order.ships) }
-            state.turnEvents.add(TurnEvent.FleetLaunched(playerId, order.from, order.to, order.ships))
-        }
+        val dist = distance(origin, target)
+        val fleet = Fleet(
+            owner = playerId,
+            ships = order.ships,
+            killRatio = origin.killRatio,
+            from = order.from,
+            to = order.to,
+            distanceRemaining = dist,
+        )
+
+        state.fleets.add(fleet)
+        state.planets.update(order.from) { it.copy(ships = it.ships - order.ships) }
+        state.turnEvents.add(TurnEvent.FleetLaunched(playerId, order.from, order.to, order.ships))
     }
 }
 
@@ -92,7 +87,7 @@ private fun resolveArrivals(state: GameState) {
 
     // Mark attacked planets as visited for fog of war
     for (fleet in arrived) {
-        val planet = state.planets.find { it.label == fleet.to } ?: continue
+        val planet = state.findPlanetById(fleet.to) ?: continue
         if (planet.owner != Owner.Player(fleet.owner)) {
             state.visited.getOrPut(fleet.owner) { mutableSetOf() }.add(fleet.to)
         }
@@ -101,66 +96,79 @@ private fun resolveArrivals(state: GameState) {
     // Process each fleet individually, interleaved by player
     val byOwner = arrived.groupBy { it.owner }.mapValues { it.value.toMutableList() }
 
-    while (byOwner.any { it.value.isNotEmpty() }) {
-        // Player with more remaining fleets goes first each cycle
-        val sortedOwners = byOwner.entries
-            .filter { it.value.isNotEmpty() }
-            .sortedWith(compareByDescending<Map.Entry<PlayerId, MutableList<Fleet>>> { it.value.size }
-                .thenBy { it.key.value })
-            .map { it.key }
+    // Player with more total fleets goes first — fixed at start
+    val sortedOwners = byOwner.entries
+        .sortedWith(compareByDescending { it.value.size })
+        .map { it.key }
 
+    while (byOwner.any { it.value.isNotEmpty() }) {
         for (fleetOwner in sortedOwners) {
             val fleetQueue = byOwner[fleetOwner] ?: continue
             if (fleetQueue.isEmpty()) continue
             val fleet = fleetQueue.removeFirst()
 
             // Re-fetch planet state (may have changed from prior fleet resolution)
-            val planet = state.planets.find { it.label == fleet.to } ?: continue
+            val planet = state.findPlanetById(fleet.to) ?: continue
 
-            if (planet.owner == Owner.Player(fleetOwner)) {
-                // Reinforcement
-                state.planets.update(fleet.to) { it.copy(ships = it.ships + fleet.ships) }
-                state.turnEvents.add(TurnEvent.FleetArrived(fleetOwner, fleet.to, fleet.ships))
-            } else {
-                // Attack — individual fleet combat
-                val surviving = resolveCombat(
-                    fleet.ships, fleet.killRatio,
-                    planet.ships, planet.killRatio
-                )
-                val outcome = when {
-                    surviving.attacker.some && surviving.defender.none -> BattleOutcome.CONQUERED
-                    surviving.defender.some -> BattleOutcome.REPELLED
-                    else -> BattleOutcome.DRAW
+            when (planet.owner) {
+                Owner.Player(fleetOwner) -> {
+                    // Reinforcement
+                    state.planets.update(fleet.to) { it.copy(ships = it.ships + fleet.ships) }
+                    state.turnEvents.add(TurnEvent.FleetArrived(fleetOwner, fleet.to, fleet.ships))
                 }
-
-                state.turnEvents.add(
-                    TurnEvent.BattleResolved(
-                        planet = fleet.to,
-                        attacker = fleetOwner,
-                        defender = planet.owner,
-                        forces = Combatants(fleet.ships, planet.ships),
-                        surviving = surviving,
-                        outcome = outcome,
-                    )
-                )
-
-                if (outcome == BattleOutcome.CONQUERED) {
-                    state.planets.update(fleet.to) { it.copy(owner = Owner.Player(fleetOwner), ships = surviving.attacker) }
-                } else {
-                    state.planets.update(fleet.to) {
-                        if (surviving.defender.none) it.copy(owner = Owner.Neutral, ships = ShipCount.ZERO)
-                        else it.copy(ships = surviving.defender)
-                    }
+                else -> {
+                    // Attack — individual fleet combat
+                    attack(state, fleetOwner, fleet, planet)
                 }
-
-                // Event trigger after each combat (~33% chance)
-                maybeFireEvent(state)?.let { state.turnEvents.add(it) }
             }
+
+            // Event trigger after each fleet arrival (~33% chance)
+            maybeFireEvent(state)?.let { state.turnEvents.add(it) }
         }
     }
 
     // One more event trigger at the end of fleet processing (~33% chance)
     maybeFireEvent(state)?.let { state.turnEvents.add(it) }
+}
+
+private fun attack(
+    state: GameState,
+    fleetOwner: PlayerId,
+    fleet: Fleet,
+    planet: Planet
+) {
+    val surviving = resolveCombat(
+        fleet.ships, fleet.killRatio,
+        planet.ships, planet.killRatio
+    )
+    val outcome = when {
+        surviving.attacker.some && surviving.defender.none -> BattleOutcome.CONQUERED
+        surviving.defender.some -> BattleOutcome.REPELLED
+        else -> BattleOutcome.DRAW
+    }
+
+    state.turnEvents.add(
+        TurnEvent.BattleResolved(
+            planet = fleet.to,
+            attacker = fleetOwner,
+            defender = planet.owner,
+            forces = Combatants(fleet.ships, planet.ships),
+            surviving = surviving,
+            outcome = outcome,
+        )
+    )
+
+    when (outcome) {
+        BattleOutcome.CONQUERED -> {
+            state.planets.update(fleet.to) { it.copy(owner = Owner.Player(fleetOwner), ships = surviving.attacker) }
+        }
+
+        else -> {
+            // DRAW: keep existing owner with 0 ships (dead code — can't happen due to sequential checking)
+            // REPELLED: defender retains planet with surviving ships
+            state.planets.update(fleet.to) { it.copy(ships = surviving.defender) }
+        }
+    }
 }
 
 private fun resolveProduction(state: GameState) {

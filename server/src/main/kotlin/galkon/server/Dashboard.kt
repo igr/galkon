@@ -2,6 +2,7 @@ package galkon.server
 
 import galkon.common.Colors
 import galkon.common.GamePhase
+import galkon.common.GameStatus
 import io.ktor.server.html.*
 import io.ktor.server.routing.*
 import kotlinx.html.*
@@ -10,8 +11,6 @@ fun Routing.dashboardRoutes(lobby: Lobby) {
 
     get("/dashboard") {
         val sessions = lobby.allSessions().map { it.snapshotStatus() to it.lastActivity }
-        val now = System.currentTimeMillis()
-
         val totalGames = sessions.size
         val inLobby = sessions.count { it.first.phase == GamePhase.Lobby }
         val inProgress = sessions.count { it.first.phase is GamePhase.InProgress }
@@ -19,65 +18,79 @@ fun Routing.dashboardRoutes(lobby: Lobby) {
         val totalPlayers = sessions.sumOf { it.first.players.size }
 
         call.respondHtml {
-            head {
-                title { +"Galkon Dashboard" }
-                style {
-                    unsafe {
-                        raw(CSS)
+            dashboard(
+                totalGames, inLobby, inProgress, finished, totalPlayers, sessions)
+        }
+    }
+}
+
+private fun HTML.dashboard(
+    totalGames: Int,
+    inLobby: Int,
+    inProgress: Int,
+    finished: Int,
+    totalPlayers: Int,
+    sessions: List<Pair<GameStatus, Long>>,
+) {
+    val now = System.currentTimeMillis()
+    head {
+        title { +"Galkon Dashboard" }
+        style {
+            unsafe {
+                raw(CSS)
+            }
+        }
+    }
+    body {
+        h1 { +"Galkon Dashboard" }
+        p("version") { +"Server: $gameVersion" }
+
+        div("stats") {
+            stat("Total Games", "$totalGames")
+            stat("Lobby", "$inLobby")
+            stat("In Progress", "$inProgress")
+            stat("Finished", "$finished")
+            stat("Total Players", "$totalPlayers")
+        }
+
+        if (sessions.isNotEmpty()) {
+            table {
+                thead {
+                    tr {
+                        for (h in listOf("Code", "Phase", "Turn", "Players", "Idle")) {
+                            th { +h }
+                        }
+                    }
+                }
+                tbody {
+                    for ((status, lastActivity) in sessions.sortedByDescending { it.second }) {
+                        val phase = when (val p = status.phase) {
+                            is GamePhase.Lobby -> "Lobby"
+
+                            is GamePhase.SetUp -> "Setup ${p.round}/3"
+                            is GamePhase.InProgress -> "Turn ${p.turn}"
+                            is GamePhase.Finished -> "Finished"
+                        }
+                        val idle = formatDuration(now - lastActivity)
+                        val playerNames = status.players.joinToString(", ") { it.name.value }
+
+                        tr {
+                            td("code") { +status.gameCode }
+                            td { +phase }
+                            td { +if (status.phase is GamePhase.InProgress) "${(status.phase as GamePhase.InProgress).turn}" else "-" }
+                            td {
+                                +"${status.players.size}"
+                                if (playerNames.isNotEmpty()) {
+                                    span("player-names") { +" ($playerNames)" }
+                                }
+                            }
+                            td { +idle }
+                        }
                     }
                 }
             }
-            body {
-                h1 { +"Galkon Dashboard" }
-                p("version") { +"Server: $gameVersion" }
-
-                div("stats") {
-                    stat("Total Games", "$totalGames")
-                    stat("Lobby", "$inLobby")
-                    stat("In Progress", "$inProgress")
-                    stat("Finished", "$finished")
-                    stat("Total Players", "$totalPlayers")
-                }
-
-                if (sessions.isNotEmpty()) {
-                    table {
-                        thead {
-                            tr {
-                                for (h in listOf("Code", "Phase", "Turn", "Players", "Idle")) {
-                                    th { +h }
-                                }
-                            }
-                        }
-                        tbody {
-                            for ((status, lastActivity) in sessions.sortedByDescending { it.second }) {
-                                val phase = when (val p = status.phase) {
-                                    is GamePhase.Lobby -> "Lobby"
-                                    is GamePhase.SetUp -> "Setup ${p.round}/3"
-                                    is GamePhase.InProgress -> "Turn ${p.turn}"
-                                    is GamePhase.Finished -> "Finished"
-                                }
-                                val idle = formatDuration(now - lastActivity)
-                                val playerNames = status.players.joinToString(", ") { it.name.value }
-
-                                tr {
-                                    td("code") { +status.gameCode }
-                                    td { +phase }
-                                    td { +if (status.phase is GamePhase.InProgress) "${(status.phase as GamePhase.InProgress).turn}" else "-" }
-                                    td {
-                                        +"${status.players.size}"
-                                        if (playerNames.isNotEmpty()) {
-                                            span("player-names") { +" ($playerNames)" }
-                                        }
-                                    }
-                                    td { +idle }
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    p("empty") { +"No active games" }
-                }
-            }
+        } else {
+            p("empty") { +"No active games" }
         }
     }
 }

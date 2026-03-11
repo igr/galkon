@@ -7,7 +7,7 @@ private const val MAX_SETUP_ROUNDS = 3
 
 /** Wraps game state with synchronization for a single game. */
 class GameSession(val gameCode: String, gamConfig: GameConfig) {
-    private var state = GameState.lobby(gamConfig)
+    private var state = GameState.phaseLobby(gamConfig)
 
     /** The first player to join is the host. */
     private var hostId: PlayerId? = null
@@ -56,7 +56,7 @@ class GameSession(val gameCode: String, gamConfig: GameConfig) {
             }
 
             else -> {
-                state = transitionGameToSetUp(state.config, state.players)
+                state = phaseGameToSetUp(state.config, state.players)
                 Result.success(Unit)
             }
         }
@@ -75,10 +75,10 @@ class GameSession(val gameCode: String, gamConfig: GameConfig) {
                 if (state.setupVotes.size == state.players.size) {
                     val allAgree = state.setupVotes.values.all { it }
                     if (allAgree || phase.round >= MAX_SETUP_ROUNDS) {
-                        transitionSetUpToInProgress(state)
+                        phaseSetUpToInProgress(state)
                     } else {
                         val newConfig = state.config.copy(seed = state.config.seed + 1)
-                        state = transitionGameToSetUp(newConfig, state.players, phase.round + 1)
+                        state = phaseGameToSetUp(newConfig, state.players, phase.round + 1)
                     }
                 }
                 Result.success(Unit)

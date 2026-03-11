@@ -121,17 +121,17 @@ Key points:
 
 - If **defender ships > 0**: "Planet Is Retained" — defender keeps the planet.
 - If **attacker ships > 0**: "Planet Is Invaded" — the attacker takes ownership, remaining attacker ships become the garrison, and they **adopt the planet's kill ratio** going forward.
+- If **both reach 0** (unreachable due to sequential checking): planet retains current owner with 0 ships.
 
 ### Fleet Arrival Order
 
 Fleets do **NOT merge** before combat. Each fleet attacks **separately in sequence**. The Navigator interleaves Player 1 and Player 2 fleet resolutions:
-- If Player 1 has more orders, P1 fleets are processed first each cycle.
-- If Player 2 has more orders, P2 fleets are processed first each cycle.
-- If equal, P1 goes first each cycle.
+- The player with more **total** arriving fleets goes first. This priority is determined **once** at the start and stays fixed throughout the cycle.
+- If equal, the first player goes first each cycle.
 
 ## Events
 
-Events are random occurrences that can happen **after each individual combat resolution** and **once at the end of fleet processing** (Navigator). They also occur during end-game fleet resolution.
+Events are random occurrences that can happen **after each fleet arrival** (both reinforcements and combat) and **once at the end of fleet processing** (Navigator). They also occur during end-game fleet resolution.
 
 ### Event Trigger
 
@@ -140,13 +140,14 @@ Events are random occurrences that can happen **after each individual combat res
 
 ### Event Types
 
-A random roll `random(1..90)` determines the event:
+A random roll `INT(RND * 90)` (0–89) determines the event:
 
 | Roll    | Event               | Effect |
 |---------|---------------------|--------|
-| 67–90   | **Change Production** | Production changes by 1–9. ~50% chance increase, ~50% decrease. Floor at 0. |
+| 67–89   | **Change Production** | Production changes by 1–9. ~50% chance increase, ~50% decrease. Floor at 0. |
 | 34–66   | **Change Kill Ratio** | Kill ratio changes by 1–19. ~60% chance increase, ~40% decrease. Floor at 0. |
 | 2–33    | **Revolt**          | **No effect** — flavor text only ("A revolt has been thwarted"). |
+| 0–1     | *(no event)*        | |
 
 - Production and kill ratio changes are permanent for that planet.
 - There is **no upper cap** on production or kill ratio from events (only a floor of 0).
@@ -197,6 +198,6 @@ Each turn resolves in this order:
 
 1. **Player 1 enters moves** (ships deducted immediately from source planets).
 2. **Player 2 enters moves** (ships deducted immediately from source planets).
-3. **Fleet movement & combat** — All fleets advance 2 light-years. Arriving fleets resolve immediately (reinforcement or combat). After each combat, an **Event** may trigger (~33% chance). Fleets are processed in interleaved order between players.
+3. **Fleet movement & combat** — All fleets advance 2 light-years. Arriving fleets resolve immediately (reinforcement or combat). After each fleet arrival, an **Event** may trigger (~33% chance). Fleets are processed in interleaved order between players.
 4. **Final event** — One additional event check at the end of fleet processing.
 5. **Production** — All owned planets generate new ships equal to their production value.

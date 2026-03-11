@@ -17,10 +17,10 @@ internal fun maybeFireEvent(state: GameState): TurnEvent? {
     val owner = planet.owner
     if (owner !is Owner.Player) return null
 
-    val roll = Random.nextInt(1, 91) // 1..90
+    val roll = Random.nextInt(90) // 0..89
 
     return when {
-        roll >= 67 -> {
+        roll > 66 -> {
             // Change Production: +/- 1-9, ~50/50 increase/decrease, floor at 0
             val change = Random.nextInt(1, 10)
             val increase = Random.nextBoolean()
@@ -30,7 +30,7 @@ internal fun maybeFireEvent(state: GameState): TurnEvent? {
             TurnEvent.EventProductionChanged(planet.label, owner.id, newProd)
         }
 
-        roll >= 34 -> {
+        roll > 33 -> {
             // Change Kill Ratio: +/- 1-19, ~60% increase / ~40% decrease, floor at 0
             val change = KillRatio.random(1, 20)
             val increase = Random.nextInt(100) < 60
@@ -40,7 +40,7 @@ internal fun maybeFireEvent(state: GameState): TurnEvent? {
             TurnEvent.EventKillRatioChanged(planet.label, owner.id, newKill)
         }
 
-        roll >= 2 -> {
+        roll > 1 -> {
             // Revolt (flavor text only — no game effect)
             TurnEvent.EventRevoltThwarted(planet.label, owner.id)
         }
