@@ -19,6 +19,7 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory=/opt/galkon/server
+Environment=PORT=80
 ExecStart=/opt/galkon/server/bin/server
 Restart=on-failure
 RestartSec=5

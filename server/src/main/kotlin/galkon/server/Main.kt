@@ -35,7 +35,8 @@ fun main() {
         }
     }
 
-    embeddedServer(Netty, port = 8080) {
+    val port = System.getenv("PORT")?.toIntOrNull() ?: 8080
+    embeddedServer(Netty, port = port) {
         install(ContentNegotiation) {
             json(GameJson)
         }
