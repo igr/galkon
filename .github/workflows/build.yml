@@ -30,3 +30,37 @@ jobs:
         with:
           name: galkon-dist
           path: server/build/distributions/server.zip
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: galkon-dist
+
+      - name: Deploy to Hetzner
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          HOST: ${{ secrets.DEPLOY_HOST }}
+          USER: ${{ secrets.DEPLOY_USER }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+          SSH="ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new ${USER}@${HOST}"
+          SCP="scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new"
+
+          $SCP server.zip "${USER}@${HOST}:/tmp/galkon-dist.zip"
+          $SSH << 'EOF'
+            set -e
+            sudo systemctl stop galkon || true
+            rm -rf /opt/galkon/server
+            unzip -o /tmp/galkon-dist.zip -d /opt/galkon
+            rm /tmp/galkon-dist.zip
+            sudo systemctl start galkon
+          EOF
