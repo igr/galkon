@@ -41,6 +41,12 @@ fun main() {
             json(GameJson)
         }
         install(CORS) {
+            val prod = System.getenv("GALKON_ENV") == "production"
+            if (prod) {
+                allowHost("galkon.top", schemes = listOf("https"))
+            } else {
+                anyHost()
+            }
             allowSameOrigin = true
             allowMethod(HttpMethod.Post)
             allowMethod(HttpMethod.Get)

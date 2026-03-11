@@ -29,3 +29,7 @@ clean:
 # Health check against running server
 health:
     curl -s http://localhost:8080/health | python3 -m json.tool
+
+# Setup the server
+srv-setup:
+    ssh root@188.245.227.21 'bash -s' < deploy/setup.sh
