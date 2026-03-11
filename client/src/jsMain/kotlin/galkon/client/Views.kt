@@ -38,9 +38,9 @@ fun renderApp(state: AppState) {
 private fun renderLobby(state: AppState): HTMLElement = document.create.div("lobby") {
     h1 { +"GALKON" }
 
-    // Server URL
-    div("section") {
-        h2 { +"Server URL" }
+    // Server URL (collapsible)
+    details("section") {
+        summary { +"Server URL" }
         textInput {
             id = "input-server-url"
             value = state.serverUrl
@@ -109,6 +109,7 @@ private fun renderLobby(state: AppState): HTMLElement = document.create.div("lob
                     style = "color: ${Colors.TEXT_DIM}; margin-top: 10px"
                 }
             }
+            button(classes = "btn-cancel") { +"Cancel"; onClickFunction = { doCancelGame() } }
         }
     }
 

@@ -41,7 +41,7 @@ data class GameConfig(
         const val MAX_PLAYERS = 8
 
         /** Max concurrent games. */
-        const val MAX_GAMES = 100
+        const val MAX_GAMES = 1000
 
         /** Inactive game timeout. */
         val INACTIVE_TIMEOUT: Duration = 30.minutes

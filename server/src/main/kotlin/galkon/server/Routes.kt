@@ -53,6 +53,16 @@ fun Routing.gameRoutes(lobby: Lobby) {
         )
     }
 
+    post("/games/{code}/leave/{playerId}") {
+        val code = call.requireParam("code")
+        val session = lobby.requireSession(code)
+        val playerId = PlayerId(call.requireParam("playerId"))
+        call.respondResult(session.leave(playerId).map { removeGame ->
+            if (removeGame) lobby.removeGame(code)
+            OkResponse()
+        })
+    }
+
     post("/games/{code}/start") {
         val session = lobby.requireSession(call.requireParam("code"))
         val req = call.receive<StartGameRequest>()

@@ -34,6 +34,10 @@ suspend fun apiJoinGame(serverUrl: String, code: String, playerName: String): Jo
     return GameJson.decodeFromString(text)
 }
 
+suspend fun apiLeaveGame(serverUrl: String, code: String, playerId: String) {
+    fetchJson("$serverUrl/games/$code/leave/$playerId", "POST")
+}
+
 suspend fun apiStartGame(serverUrl: String, code: String, playerId: String) {
     val body = GameJson.encodeToString(StartGameRequest.serializer(), StartGameRequest(playerId))
     fetchJson("$serverUrl/games/$code/start", "POST", body)

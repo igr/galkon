@@ -39,6 +39,21 @@ class GameSession(val gameCode: String, gamConfig: GameConfig) {
         }
     }
 
+    /** Returns true if the game should be removed (host left). */
+    @Synchronized
+    fun leave(playerId: PlayerId): Result<Boolean> {
+        touch()
+        return when {
+            state.phase != GamePhase.Lobby -> Result.failure(Exception("Game already started"))
+            playerId !in state.players -> Result.failure(Exception("Invalid player"))
+            playerId == hostId -> Result.success(true)
+            else -> {
+                state.players.remove(playerId)
+                Result.success(false)
+            }
+        }
+    }
+
     @Synchronized
     fun start(playerId: PlayerId): Result<Unit> {
         touch()

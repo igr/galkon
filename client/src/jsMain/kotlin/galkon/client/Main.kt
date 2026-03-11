@@ -64,6 +64,18 @@ fun doJoinGame() {
     }
 }
 
+fun doCancelGame() {
+    scope.launch {
+        try {
+            stopPolling()
+            apiLeaveGame(currentState.serverUrl, currentState.gameCode, currentState.playerId)
+            updateState { AppState(serverUrl = serverUrl) }
+        } catch (e: Exception) {
+            updateState { copy(error = e.message ?: "Failed to cancel") }
+        }
+    }
+}
+
 fun doStartGame() {
     scope.launch {
         try {

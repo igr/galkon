@@ -104,6 +104,14 @@ body {
         border: 1px solid $border;
 
         h2 { color: $accent; font-size: 1em; margin-bottom: 10px; }
+
+        summary {
+            color: $text-dim;
+            font-size: 0.9em;
+            cursor: pointer;
+            margin-bottom: 10px;
+            &:hover { color: $text-muted; }
+        }
     }
 
     input {
@@ -120,6 +128,14 @@ body {
     }
 
     button { @extend %btn; }
+
+    .btn-cancel {
+        background: none;
+        border: 1px solid $border-light;
+        color: $text-dim;
+        margin-top: 10px;
+        &:hover { border-color: $danger; color: $danger; }
+    }
 }
 
 %btn {
