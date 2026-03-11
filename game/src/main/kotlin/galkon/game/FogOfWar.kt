@@ -42,14 +42,12 @@ data class PlayerView(
 
 /** Generate a fog-of-war filtered view for a specific player. */
 fun makePlayerView(state: GameState, playerId: PlayerId): PlayerView {
-    val currentTurn = (state.phase as? GamePhase.InProgress)?.turn ?: 0
+    val currentTurn = state.currentTurn
     val playerVisited = state.visited[playerId] ?: emptySet()
-
-    val fullVisibility = state.phase is GamePhase.SetUp
 
     val viewPlanets = state.planets.map { p ->
         when {
-            fullVisibility || p.owner == Owner.Player(playerId) -> {
+            playerId.ownsPlanet(p) -> {
                 ViewPlanet.Owned(p.label, p.position, p.owner, p.ships, p.production, p.killRatio)
             }
             else -> {

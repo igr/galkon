@@ -1,9 +1,12 @@
 package galkon.game
 
 import galkon.common.*
+import galkon.common.Owner.Player
+
+internal fun PlayerId.ownsPlanet(planet: Planet) = planet.owner == Player(this)
 
 internal fun PlayerId.canLaunchShipsFrom(planet: Planet, ships: ShipCount) =
-    planet.owner == Owner.Player(this) && planet.ships >= ships && ships.some
+    ownsPlanet(planet) && planet.ships >= ships && ships.some
 
 internal fun GameState.hasOneOrNoPlayersLeft(): Boolean {
     val activePlayers = this.players.keys

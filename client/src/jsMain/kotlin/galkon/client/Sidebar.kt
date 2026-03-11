@@ -19,12 +19,12 @@ fun renderSidebar(state: AppState): HTMLElement = document.create.div("sidebar")
             isNeutral -> "planet-row neutral"
             else -> "planet-row enemy"
         }
-        val ownerPrefix = if (!isYou && !isNeutral) "(${shortName(ownerName(p.owner))}) " else ""
+        val ownerPrefix = if (!isYou && !isNeutral) "${shortName(ownerName(p.owner))} " else ""
         val detail = run {
             val ships: Int = p.ships ?: return@run ownerName(p.owner)
             val pending = allocated[p.label] ?: 0
-            val display = if (isYou && pending > 0) "${ships - pending}/$ships" else "$ships"
-            "$ownerPrefix$display ships  P:${p.production ?: "?"}  K:${p.killRatio ?: "?"}"
+            val displayShips = if (isYou && pending > 0) "${ships - pending}/$ships" else "$ships"
+            "${ownerPrefix}S:$displayShips P:${p.production ?: "?"}  K:${p.killRatio ?: "?"}"
         }
         div(cssClass) {
             span("label") { +p.label }

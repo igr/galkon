@@ -26,6 +26,10 @@ fun renderApp(state: AppState) {
         Screen.SCORES -> app.appendChild(renderScores(state))
     }
 
+    if (state.rulesOpen && state.rulesHtml.isNotEmpty()) {
+        app.appendChild(renderRulesPopup(state))
+    }
+
     // Restore focus after re-render
     if (activeId != null) {
         val el = document.getElementById(activeId) as? HTMLInputElement
@@ -116,6 +120,13 @@ private fun renderLobby(state: AppState): HTMLElement = document.create.div("lob
     if (state.error.isNotEmpty()) {
         div("error") { +state.error }
     }
+
+    div("rules-link") {
+        a {
+            +"Game Rules"
+            onClickFunction = { showRules() }
+        }
+    }
 }
 
 private fun renderGame(state: AppState): HTMLElement = document.create.div("game") {
@@ -140,6 +151,10 @@ private fun renderGame(state: AppState): HTMLElement = document.create.div("game
                             onClickFunction = { updateState { AppState(serverUrl = serverUrl) } }
                         }
                         div("menu-item") {
+                            +"Rules"
+                            onClickFunction = { updateState { copy(menuOpen = false) }; showRules() }
+                        }
+                        div("menu-item") {
                             +"About"
                             onClickFunction = { updateState { copy(menuOpen = false, aboutOpen = true) } }
                         }
@@ -149,11 +164,17 @@ private fun renderGame(state: AppState): HTMLElement = document.create.div("game
         }
     }
 }. also { div ->
+    if (!state.sidebarVisible) {
+        div.classList.add("no-sidebar")
+    }
     div.appendChild(renderGalaxy(state))
-    if (state.battleEvent != null) {
-        div.appendChild(renderBattleSidebar(state))
-    } else {
-        div.appendChild(renderSidebar(state))
+    div.appendChild(renderSidebarToggle(state))
+    if (state.sidebarVisible) {
+        if (state.battleEvent != null) {
+            div.appendChild(renderBattleSidebar(state))
+        } else {
+            div.appendChild(renderSidebar(state))
+        }
     }
 
     if (state.gamePhase == "setup") {
@@ -170,10 +191,10 @@ private fun renderGame(state: AppState): HTMLElement = document.create.div("game
     if (state.aboutOpen) {
         div.appendChild(document.create.div("about-overlay") {
             div("about-popup") {
-                p { +"Just wanted to play this game again :)" }
+                p { +"Just wanted to play Galcon again :)" }
                 p {
                     a(href = "https://igo.rs") { +"igo.rs" }
-                    +" / "
+                    +" | "
                     a(href = "https://github.com/igr/galkon") { +"github.com/igr/galkon" }
                 }
                 button { +"Close"; onClickFunction = { updateState { copy(aboutOpen = false) } } }
@@ -230,6 +251,31 @@ private fun renderScores(state: AppState): HTMLElement = document.create.div("sc
     }
 
     button { +"Back to Lobby"; onClickFunction = { updateState { AppState(serverUrl = serverUrl) } } }
+}
+
+private fun renderSidebarToggle(state: AppState): HTMLElement = document.create.div("sidebar-toggle") {
+    val chevron = if (state.sidebarVisible) "\u00BB" else "\u00AB"
+    +chevron
+    onClickFunction = { updateState { copy(sidebarVisible = !sidebarVisible) } }
+}
+
+private fun renderRulesPopup(state: AppState): HTMLElement = document.create.div("rules-overlay") {
+    div("rules-popup") {
+        div("rules-header") {
+            h2 { +"GAME RULES" }
+            button { +"\u00D7"; onClickFunction = { updateState { copy(rulesOpen = false) } } }
+        }
+        div("rules-content") {
+            // Content will be injected via innerHTML
+        }
+    }
+    onClickFunction = { e ->
+        if ((e.target as? HTMLElement)?.classList?.contains("rules-overlay") == true) {
+            updateState { copy(rulesOpen = false) }
+        }
+    }
+}.also { el ->
+    el.querySelector(".rules-content")?.innerHTML = state.rulesHtml
 }
 
 private fun Double.toFixed(digits: Int): String = asDynamic().toFixed(digits) as String

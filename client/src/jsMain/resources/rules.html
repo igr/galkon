@@ -1,0 +1,71 @@
+<h2>The Universe</h2>
+<ul>
+  <li>The playing field is a grid with randomly placed planets.</li>
+  <li><b>Planet A</b> is Player 1's home planet, <b>Planet B</b> is Player 2's and so on.</li>
+  <li>All other planets start as <b>neutral</b>.</li>
+  <li>After placement, players vote to accept or regenerate the layout.</li>
+</ul>
+
+<h2>Planet Properties</h2>
+<ul>
+  <li><b>Production</b> &mdash; ships generated per turn for the planet's owner.</li>
+  <li><b>Kill Ratio</b> &mdash; combat effectiveness. Higher is better.</li>
+</ul>
+
+<h2>Turn Structure</h2>
+<ol>
+  <li>Each player enters fleet orders (hidden from the opponent).</li>
+  <li>A move: <b>send N ships from Planet X to Planet Y</b>.</li>
+  <li>Multiple orders per turn are allowed.</li>
+  <li>Ships are deducted immediately from the source planet.</li>
+  <li>Sending ships to your own planets is allowed (reinforcements).</li>
+  <li>After both players submit, the turn resolves.</li>
+</ol>
+
+<h2>Ship Movement</h2>
+<ul>
+  <li>Ships travel <b>2 light-years per turn</b>.</li>
+  <li>Ships in transit <b>cannot be recalled</b>.</li>
+</ul>
+
+<h2>Production</h2>
+<ul>
+  <li>Happens at the <b>end of each turn</b>, after movement and combat.</li>
+  <li>Each owned planet produces ships equal to its production value.</li>
+  <li>Neutral planets do not produce ships.</li>
+  <li>A newly captured planet produces on the same turn it was captured.</li>
+</ul>
+
+<h2>Combat</h2>
+<ul>
+  <li>If a fleet arrives at a <b>friendly</b> planet, ships are added as reinforcements.</li>
+  <li>Otherwise, a battle occurs.</li>
+  <li>The defender gets a <b>home court bonus</b>.</li>
+  <li>Combat proceeds one round at a time until one side is eliminated.</li>
+  <li>A <b>higher kill ratio</b> means better survival odds.</li>
+  <li>If the attacker wins, they take ownership and adopt the planet's kill ratio.</li>
+  <li>Fleets do <b>not merge</b> before combat &mdash; each resolves separately.</li>
+</ul>
+
+<h2>Events</h2>
+<ul>
+  <li>Random events may trigger after each fleet arrival.</li>
+  <li><b>Change Production</b> &mdash; planet production changes.</li>
+  <li><b>Change Kill Ratio</b> &mdash; planet kill ratio changes.</li>
+  <li><b>Revolt</b> &mdash; flavor text only, no actual effect.</li>
+</ul>
+
+<h2>Fog of War</h2>
+<ul>
+  <li>You can see enemy planets and their labels.</li>
+  <li>You can see enemy ship counts and stats.</li>
+  <li>You <b>cannot</b> see enemy fleets in transit.</li>
+</ul>
+
+<h2>Game End</h2>
+<ul>
+  <li>The game ends after the configured number of turns (40).</li>
+  <li>All remaining in-transit fleets are resolved over additional movement cycles.</li>
+  <li>Production continues during fleet resolution.</li>
+  <li>Final scores are then calculated.</li>
+</ul>

@@ -38,4 +38,7 @@ data class AppState(
     val menuOpen: Boolean = false,
     val battleEvent: TurnEventDto? = null,
     val aboutOpen: Boolean = false,
+    val sidebarVisible: Boolean = true,
+    val rulesOpen: Boolean = false,
+    val rulesHtml: String = "",
 )

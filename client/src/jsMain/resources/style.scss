@@ -1,3 +1,5 @@
+@use "sass:color";
+
 $accent: #00ff88;
 $accent-hover: #00cc66;
 $bg-dark: #0a0a2e;
@@ -181,8 +183,35 @@ body {
     grid-template-rows: auto 1fr auto auto;
     gap: 10px;
     height: calc(100vh - 30px);
+    position: relative;
 
     .header { grid-column: 1 / -1; }
+
+    &.no-sidebar {
+        grid-template-columns: 1fr;
+        .galaxy { grid-column: 1; }
+    }
+}
+
+/* Sidebar toggle */
+.sidebar-toggle {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 5;
+    background: $bg-panel;
+    border: 1px solid $border;
+    border-right: none;
+    color: $text-dim;
+    font-size: 0.9em;
+    padding: 8px 3px;
+    cursor: pointer;
+    line-height: 1;
+
+    &:hover { color: $accent; border-color: $accent; }
+
+    .no-sidebar & { right: 0; border-right: none; }
 }
 
 /* Galaxy map */
@@ -449,7 +478,7 @@ body {
     .btn-disagree {
         @extend %btn;
         background: $danger;
-        &:hover { background: darken($danger, 10%); }
+        &:hover { background: color.adjust($danger, $lightness: -10%); }
     }
 
     .waiting { color: $text-dim; font-style: italic; }
@@ -461,7 +490,7 @@ body {
     background: $bg-panel;
     border: 1px solid $border;
     padding: 10px;
-    max-height: 150px;
+    height: 150px;
     overflow-y: auto;
     font-size: 0.85em;
 
@@ -515,6 +544,99 @@ body {
     }
 
     button { @extend %btn; margin-top: 8px; }
+}
+
+/* Rules link (lobby) */
+.rules-link {
+    margin-top: 20px;
+
+    a {
+        color: $text-dim;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 0.9em;
+        &:hover { color: $accent; }
+    }
+}
+
+/* Rules popup */
+.rules-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.rules-popup {
+    background: $bg-panel;
+    border: 1px solid $border-light;
+    max-width: 700px;
+    width: 90%;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+
+    .rules-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 20px;
+        border-bottom: 1px solid $border;
+
+        h2 { color: $accent; font-size: 1em; margin: 0; }
+
+        button {
+            background: none;
+            border: none;
+            color: $text-dim;
+            font-size: 1.4em;
+            cursor: pointer;
+            padding: 0 4px;
+            line-height: 1;
+            &:hover { color: $accent; }
+        }
+    }
+
+    .rules-content {
+        padding: 15px 20px;
+        overflow-y: auto;
+        font-size: 0.85em;
+        color: $text-muted;
+        line-height: 1.5;
+
+        h2 {
+            color: $accent;
+            font-size: 0.95em;
+            margin: 15px 0 8px 0;
+            border-bottom: 1px solid $border;
+            padding-bottom: 3px;
+            &:first-child { margin-top: 0; }
+        }
+
+        ul, ol { margin: 5px 0 10px 20px; }
+        li { margin-bottom: 3px; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 8px 0;
+        }
+        th { color: $accent; border-bottom: 1px solid $border; padding: 4px 8px; text-align: left; font-size: 0.9em; }
+        td { padding: 4px 8px; border-bottom: 1px solid $border; }
+
+        pre {
+            background: $bg-dark;
+            padding: 8px 12px;
+            border: 1px solid $border;
+            margin: 8px 0;
+            overflow-x: auto;
+        }
+
+        b { color: $text; }
+    }
 }
 
 /* Scores */

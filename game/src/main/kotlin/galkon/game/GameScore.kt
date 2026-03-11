@@ -1,6 +1,5 @@
 package galkon.game
 
-import galkon.common.Owner
 import galkon.common.Planet
 import galkon.common.PlayerInfo
 import galkon.common.PlayerScore
@@ -13,7 +12,7 @@ import galkon.common.sumShips
  */
 fun calculateScores(state: GameState): List<PlayerScore> =
     state.players.map { (playerId, playerInfo) ->
-        val ownedPlanets = state.planets.filter { it.owner == Owner.Player(playerId) }
+        val ownedPlanets = state.planets.filter { playerId.ownsPlanet(it) }
         when (ownedPlanets.size) {
             0 -> {
                 PlayerScore(playerInfo, 0, ShipCount.ZERO, 0.0)

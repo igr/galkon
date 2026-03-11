@@ -5,6 +5,7 @@ package galkon.client
 import galkon.common.*
 import kotlinx.browser.window
 import kotlinx.coroutines.*
+import kotlinx.coroutines.await
 
 private val styles = js("require('./style.scss')")
 
@@ -24,6 +25,21 @@ fun main() {
 fun updateState(transform: AppState.() -> AppState) {
     currentState = currentState.transform()
     renderApp(currentState)
+}
+
+fun showRules() {
+    if (currentState.rulesHtml.isNotEmpty()) {
+        updateState { copy(rulesOpen = true) }
+        return
+    }
+    scope.launch {
+        try {
+            val html = window.fetch("rules.html").await().text().await()
+            updateState { copy(rulesHtml = html, rulesOpen = true) }
+        } catch (e: Exception) {
+            updateState { copy(error = "Failed to load rules") }
+        }
+    }
 }
 
 // ---- Game lifecycle actions ----
@@ -329,7 +345,7 @@ private fun playEventAt(index: Int, events: List<TurnEventDto>) {
 private fun startBattleAnimation(event: TurnEventDto) {
     val startTime = window.performance.now()
     val duration = 3000.0
-    val winnerDelay = 1000
+    val winnerDelay = 1500
 
     val initialAttacker = event.attackerShips ?: 0
     val initialDefender = event.defenderShips ?: 0
