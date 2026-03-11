@@ -3,12 +3,14 @@ $accent-hover: #00cc66;
 $bg-dark: #0a0a2e;
 $bg-panel: #1a1a4e;
 $bg-galaxy: #0d0d35;
+$bg-battle: #2a0a1a;
 $text: #e0e0e0;
 $text-muted: #aaa;
 $text-dim: #888;
 $border: #333;
 $border-light: #555;
 $danger: #ff4444;
+$danger-dim: #661a1a;
 $warn: #ffaa00;
 $info: #00aaff;
 
@@ -219,6 +221,146 @@ body {
     }
 
     .fleet-row { padding: 2px 0; color: $text-muted; }
+}
+
+/* Battle sidebar */
+.battle-sidebar {
+    grid-row: 2;
+    grid-column: 2;
+    background: $bg-battle;
+    border: 1px solid $danger-dim;
+    padding: 15px 10px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+
+    .battle-header {
+        color: $danger;
+        font-size: 1.3em;
+        font-weight: bold;
+        letter-spacing: 4px;
+        text-align: center;
+        padding-bottom: 8px;
+        border-bottom: 1px solid $danger-dim;
+        width: 100%;
+    }
+
+    .battle-planet {
+        color: $text-muted;
+        font-size: 0.9em;
+        text-align: center;
+
+        .battle-planet-label {
+            color: $warn;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+    }
+
+    .battle-versus {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .battle-side {
+        flex: 1;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+
+        .side-role {
+            font-size: 0.7em;
+            font-weight: bold;
+            letter-spacing: 2px;
+            padding: 2px 6px;
+        }
+
+        .attacker-role { color: $accent; }
+        .defender-role { color: $danger; }
+
+        .side-name {
+            color: $text;
+            font-size: 0.85em;
+            font-weight: bold;
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .side-ships {
+            color: $text;
+            font-size: 2em;
+            font-weight: bold;
+            line-height: 1.1;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .side-label {
+            color: $text-dim;
+            font-size: 0.7em;
+            text-transform: uppercase;
+        }
+
+        .side-kill {
+            color: $warn;
+            font-size: 0.8em;
+            margin-top: 2px;
+        }
+    }
+
+    .battle-vs {
+        color: $danger;
+        font-weight: bold;
+        font-size: 0.9em;
+        flex-shrink: 0;
+    }
+
+    .battle-result-container {
+        width: 100%;
+        text-align: center;
+        padding: 10px 0;
+        border-top: 1px solid $danger-dim;
+
+        .battle-result-text {
+            font-size: 1.2em;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+
+            &.conquered { color: $accent; }
+            &.repelled { color: $danger; }
+        }
+
+        .battle-result-surviving {
+            color: $text-muted;
+            font-size: 0.85em;
+        }
+    }
+
+    .battle-skip {
+        width: 100%;
+        text-align: center;
+        margin-top: auto;
+
+        button {
+            background: none;
+            border: 1px solid $border-light;
+            color: $text-dim;
+            padding: 4px 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8em;
+            cursor: pointer;
+
+            &:hover { border-color: $text-muted; color: $text; }
+        }
+    }
 }
 
 /* Orders panel */

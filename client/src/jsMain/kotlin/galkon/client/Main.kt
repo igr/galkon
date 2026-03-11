@@ -280,23 +280,90 @@ private suspend fun pollState() {
     }
 }
 
+private var battleAnimFrameId: Int? = null
+private var battleEndTimerId: Int? = null
+private var battleContinuation: (() -> Unit)? = null
+
 private fun playEvents() {
-    val results = currentState.turnEvents
-    if (results.isEmpty()) return
+    val events = currentState.turnEvents
+    if (events.isEmpty()) return
+    playEventAt(0, events)
+}
 
-    var idx = 0
-    val timerId = window.setInterval({
-        idx++
-        if (idx >= results.size) {
-            // Playback done
-            updateState { copy(eventPlaybackIndex = results.size) }
-        } else {
-            updateState { copy(eventPlaybackIndex = idx) }
+private fun playEventAt(index: Int, events: List<TurnEventDto>) {
+    if (index >= events.size) {
+        updateState { copy(eventPlaybackIndex = events.size, battleEvent = null) }
+        return
+    }
+
+    updateState { copy(eventPlaybackIndex = index) }
+    val event = events[index]
+
+    if (event.type == "battle") {
+        updateState { copy(battleEvent = event) }
+        battleContinuation = {
+            window.setTimeout({
+                playEventAt(index + 1, events)
+            }, 300)
         }
-    }, 300)
+        startBattleAnimation(event)
+    } else {
+        window.setTimeout({
+            playEventAt(index + 1, events)
+        }, 300)
+    }
+}
 
-    // Stop playback after all events
-    window.setTimeout({
-        window.clearInterval(timerId)
-    }, results.size * 300 + 500)
+private fun startBattleAnimation(event: TurnEventDto) {
+    val startTime = window.performance.now()
+    val duration = 3000.0
+    val winnerDelay = 1000
+
+    val initialAttacker = event.attackerShips ?: 0
+    val initialDefender = event.defenderShips ?: 0
+    val finalAttacker = event.attackerSurviving ?: 0
+    val finalDefender = event.defenderSurviving ?: 0
+
+    fun animate(timestamp: Double) {
+        val elapsed = timestamp - startTime
+        val progress = minOf(elapsed / duration, 1.0)
+
+        // Ease-out curve for more dramatic feel
+        val eased = 1.0 - (1.0 - progress) * (1.0 - progress)
+
+        val currentAttacker = initialAttacker - ((initialAttacker - finalAttacker) * eased).toInt()
+        val currentDefender = initialDefender - ((initialDefender - finalDefender) * eased).toInt()
+
+        // Update DOM directly (avoid re-render)
+        kotlinx.browser.document.getElementById("battle-attacker-ships")?.textContent = "$currentAttacker"
+        kotlinx.browser.document.getElementById("battle-defender-ships")?.textContent = "$currentDefender"
+
+        if (progress < 1.0) {
+            battleAnimFrameId = window.requestAnimationFrame { animate(it) }
+        } else {
+            // Show result
+            (kotlinx.browser.document.getElementById("battle-result") as? org.w3c.dom.HTMLElement)
+                ?.style?.opacity = "1"
+            // Wait then continue
+            battleEndTimerId = window.setTimeout({
+                val cont = battleContinuation
+                battleContinuation = null
+                updateState { copy(battleEvent = null) }
+                cont?.invoke()
+            }, winnerDelay)
+        }
+    }
+
+    battleAnimFrameId = window.requestAnimationFrame { animate(it) }
+}
+
+fun skipBattle() {
+    battleAnimFrameId?.let { window.cancelAnimationFrame(it) }
+    battleAnimFrameId = null
+    battleEndTimerId?.let { window.clearTimeout(it) }
+    battleEndTimerId = null
+    val cont = battleContinuation
+    battleContinuation = null
+    updateState { copy(battleEvent = null) }
+    cont?.invoke()
 }

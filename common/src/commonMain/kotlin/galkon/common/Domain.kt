@@ -141,6 +141,8 @@ sealed interface TurnEvent {
         val forces: Combatants,
         val surviving: Combatants,
         val outcome: BattleOutcome,
+        val attackerKillRatio: KillRatio,
+        val defenderKillRatio: KillRatio,
     ) : TurnEvent
     data class PlanetRevolted(val planet: PlanetId, val formerOwner: PlayerId) : TurnEvent
     data class ProductionCompleted(val player: PlayerId, val planet: PlanetId, val ships: ShipCount) : TurnEvent

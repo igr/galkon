@@ -145,7 +145,11 @@ private fun renderGame(state: AppState): HTMLElement = document.create.div("game
     }
 }. also { div ->
     div.appendChild(renderGalaxy(state))
-    div.appendChild(renderSidebar(state))
+    if (state.battleEvent != null) {
+        div.appendChild(renderBattleSidebar(state))
+    } else {
+        div.appendChild(renderSidebar(state))
+    }
 
     if (state.gamePhase == "setup") {
         div.appendChild(renderSetupVoteBar(state))

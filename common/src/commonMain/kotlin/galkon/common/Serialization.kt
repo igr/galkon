@@ -139,6 +139,8 @@ data class TurnEventDto(
     val newProduction: Int? = null,
     val newKillRatio: Int? = null,
     val owner: String? = null,
+    val attackerKillRatio: Int? = null,
+    val defenderKillRatio: Int? = null,
 )
 
 @Serializable
@@ -208,6 +210,7 @@ fun TurnEvent.toDto(): TurnEventDto = when (this) {
         attackerShips = forces.attacker.value, defenderShips = forces.defender.value,
         attackerSurviving = surviving.attacker.value, defenderSurviving = surviving.defender.value,
         conquered = outcome == BattleOutcome.CONQUERED,
+        attackerKillRatio = attackerKillRatio.value, defenderKillRatio = defenderKillRatio.value,
     )
     is TurnEvent.PlanetRevolted -> TurnEventDto(
         type = "revolt", planet = planet.label, formerOwner = formerOwner.value,

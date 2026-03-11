@@ -155,6 +155,8 @@ private fun attack(
             forces = Combatants(fleet.ships, planet.ships),
             surviving = surviving,
             outcome = outcome,
+            attackerKillRatio = fleet.killRatio,
+            defenderKillRatio = planet.killRatio,
         )
     )
 
