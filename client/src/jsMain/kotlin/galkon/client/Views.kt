@@ -138,6 +138,10 @@ private fun renderGame(state: AppState): HTMLElement = document.create.div("game
                             +"Exit Game"
                             onClickFunction = { updateState { AppState(serverUrl = serverUrl) } }
                         }
+                        div("menu-item") {
+                            +"About"
+                            onClickFunction = { updateState { copy(menuOpen = false, aboutOpen = true) } }
+                        }
                     }
                 }
             }
@@ -160,6 +164,20 @@ private fun renderGame(state: AppState): HTMLElement = document.create.div("game
 
     if (state.error.isNotEmpty()) {
         div.appendChild(document.create.div("error") { +state.error })
+    }
+
+    if (state.aboutOpen) {
+        div.appendChild(document.create.div("about-overlay") {
+            div("about-popup") {
+                p { +"Just wanted to play this game again :)" }
+                p {
+                    a(href = "https://igo.rs") { +"igo.rs" }
+                    +" / "
+                    a(href = "https://github.com/igr/galkon") { +"github.com/igr/galkon" }
+                }
+                button { +"Close"; onClickFunction = { updateState { copy(aboutOpen = false) } } }
+            }
+        })
     }
 }
 

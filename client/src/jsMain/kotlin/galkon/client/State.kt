@@ -37,4 +37,5 @@ data class AppState(
     val eventPlaybackIndex: Int = -1,
     val menuOpen: Boolean = false,
     val battleEvent: TurnEventDto? = null,
+    val aboutOpen: Boolean = false,
 )

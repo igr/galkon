@@ -62,10 +62,16 @@ fun main() {
             dashboardRoutes(lobby)
 
             // Serve client static files — try multiple locations
-            val clientDir = listOf(
+            // In distribution: JAR is in lib/, go up to distribution root
+            val appBase = try {
+                File(Lobby::class.java.protectionDomain.codeSource.location.toURI()).parentFile.parentFile
+            } catch (_: Exception) { null }
+
+            val clientDir = listOfNotNull(
                 "client/build/dist/js/productionExecutable",
                 "../client/build/dist/js/productionExecutable",
                 "client-dist",
+                appBase?.resolve("client-dist")?.path,
             ).map { File(it) }.firstOrNull { it.exists() && it.isDirectory }
 
             if (clientDir != null) {

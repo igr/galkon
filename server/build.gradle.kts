@@ -26,6 +26,23 @@ sourceSets.main {
     resources.srcDir(generateVersion)
 }
 
+// Include client dist in the application distribution
+val copyClientDist by tasks.registering(Copy::class) {
+    dependsOn(":client:jsBrowserDistribution")
+    from("${rootProject.projectDir}/client/build/dist/js/productionExecutable")
+    into(layout.buildDirectory.dir("client-dist"))
+}
+
+distributions {
+    main {
+        contents {
+            from(copyClientDist) {
+                into("client-dist")
+            }
+        }
+    }
+}
+
 dependencies {
     implementation(project(":game"))
     implementation(libs.ktor.server.netty)
