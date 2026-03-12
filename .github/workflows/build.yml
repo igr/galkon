@@ -24,7 +24,7 @@ jobs:
         run: ./gradlew build
 
       - name: Build distribution
-        run: ./gradlew :server:distZip
+        run: ./gradlew :gk-server:distZip
 
       - uses: actions/upload-artifact@v6
         with:
