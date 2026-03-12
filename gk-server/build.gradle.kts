@@ -6,6 +6,7 @@ plugins {
 
 application {
     mainClass.set("galkon.server.MainKt")
+    applicationName = "server"
 }
 
 ktor {
