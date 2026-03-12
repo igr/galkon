@@ -42,6 +42,7 @@ val copyClientDist by tasks.registering(Copy::class) {
 
 distributions {
     main {
+        distributionBaseName.set("server")
         contents {
             from(copyClientDist) {
                 into("client-dist")
