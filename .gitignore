@@ -8,3 +8,6 @@ local.properties
 
 # for now, disable generated docs.
 docs
+
+# bot files
+gk-bot/bot

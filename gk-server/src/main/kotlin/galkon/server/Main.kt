@@ -66,9 +66,14 @@ fun main() {
                 )
             }
         }
+        val apiInfo = io.ktor.openapi.OpenApiInfo(
+            title = "Galkon API",
+            version = "1.0.0",
+            description = "REST API for the Galkon space conquest game.",
+        )
         routing {
-            openAPI("openapi")
-            swaggerUI("docs")
+            openAPI("openapi") { info = apiInfo }
+            swaggerUI("docs") { info = apiInfo }
             gameRoutes(lobby)
             dashboardRoutes(lobby)
 

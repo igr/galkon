@@ -8,19 +8,23 @@ build:
 
 # Run the server (serves client too)
 run:
-    ./gradlew :server:run
+    ./gradlew :gk-server:run
 
 # Build client only
 client:
-    ./gradlew :client:jsBrowserProductionWebpack
+    ./gradlew :gk-client:jsBrowserProductionWebpack
 
 # Build server only
 server:
-    ./gradlew :server:build
+    ./gradlew :gk-server:build
 
 # Build common module only
 common:
-    ./gradlew :common:build
+    ./gradlew :gk-common:build
+
+# Run bot: just bot <gameCode> [serverUrl]
+bot *args:
+    ./gradlew :gk-bot:run --console=plain --args="{{args}}"
 
 # Clean all build artifacts
 clean:
