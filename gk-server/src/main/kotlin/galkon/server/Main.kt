@@ -10,7 +10,9 @@ import io.ktor.server.http.content.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
+import io.ktor.server.plugins.openapi.*
 import io.ktor.server.plugins.statuspages.*
+import io.ktor.server.plugins.swagger.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.coroutines.*
@@ -65,6 +67,8 @@ fun main() {
             }
         }
         routing {
+            openAPI("openapi")
+            swaggerUI("docs")
             gameRoutes(lobby)
             dashboardRoutes(lobby)
 
@@ -75,8 +79,8 @@ fun main() {
             } catch (_: Exception) { null }
 
             val clientDir = listOfNotNull(
-                "client/build/dist/js/productionExecutable",
-                "../client/build/dist/js/productionExecutable",
+                "gk-client/build/dist/js/productionExecutable",
+                "../gk-client/build/dist/js/productionExecutable",
                 "client-dist",
                 appBase?.resolve("client-dist")?.path,
             ).map { File(it) }.firstOrNull { it.exists() && it.isDirectory }

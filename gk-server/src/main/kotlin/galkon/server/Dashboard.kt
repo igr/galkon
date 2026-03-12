@@ -43,7 +43,13 @@ private fun HTML.dashboard(
     }
     body {
         h1 { +"Galkon Dashboard" }
-        p("version") { +"Server: $gameVersion" }
+        p("version") {
+            +"Server: $gameVersion"
+            +" | "
+            a(href = "/docs") { +"Swagger UI" }
+            +" | "
+            a(href = "/openapi") { +"OpenAPI Spec" }
+        }
 
         div("stats") {
             stat("Total Games", "$totalGames")
@@ -72,16 +78,21 @@ private fun HTML.dashboard(
                             is GamePhase.Finished -> "Finished"
                         }
                         val idle = formatDuration(now - lastActivity)
-                        val playerNames = status.players.joinToString(", ") { it.name.value }
-
                         tr {
                             td("code") { +status.gameCode }
                             td { +phase }
                             td { +if (status.phase is GamePhase.InProgress) "${(status.phase as GamePhase.InProgress).turn}" else "-" }
                             td {
                                 +"${status.players.size}"
-                                if (playerNames.isNotEmpty()) {
-                                    span("player-names") { +" ($playerNames)" }
+                                if (status.players.isNotEmpty()) {
+                                    ul("player-list") {
+                                        for (p in status.players) {
+                                            li {
+                                                +p.name.value
+                                                span("player-id") { +" ${p.id.value}" }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                             td { +idle }
@@ -146,7 +157,11 @@ private val CSS = """
         font-size: 0.9em;
     }
     td { padding: 8px; border-bottom: 1px solid ${Colors.BORDER}; }
+    .version a { color: ${Colors.ACCENT}; text-decoration: none; }
+    .version a:hover { text-decoration: underline; }
     .code { font-weight: bold; letter-spacing: 2px; }
-    .player-names { color: ${Colors.TEXT_DIM}; font-size: 0.85em; }
+    .player-list { list-style: none; margin-top: 4px; }
+    .player-list li { font-size: 0.85em; }
+    .player-id { color: ${Colors.TEXT_DIM}; font-size: 0.85em; }
     .empty { color: ${Colors.TEXT_DIM}; font-style: italic; margin-top: 20px; }
 """.trimIndent()

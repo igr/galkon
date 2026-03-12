@@ -1,11 +1,18 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.serialization)
-    application
+    alias(libs.plugins.ktor)
 }
 
 application {
     mainClass.set("galkon.server.MainKt")
+}
+
+ktor {
+    openApi {
+        enabled = true
+        codeInferenceEnabled = true
+    }
 }
 
 val generateVersion by tasks.registering {
@@ -28,8 +35,8 @@ sourceSets.main {
 
 // Include client dist in the application distribution
 val copyClientDist by tasks.registering(Copy::class) {
-    dependsOn(":client:jsBrowserDistribution")
-    from("${rootProject.projectDir}/client/build/dist/js/productionExecutable")
+    dependsOn(":gk-client:jsBrowserDistribution")
+    from("${rootProject.projectDir}/gk-client/build/dist/js/productionExecutable")
     into(layout.buildDirectory.dir("client-dist"))
 }
 
@@ -44,12 +51,14 @@ distributions {
 }
 
 dependencies {
-    implementation(project(":game"))
+    implementation(project(":gk-game"))
     implementation(libs.ktor.server.netty)
     implementation(libs.ktor.server.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.server.cors)
     implementation(libs.ktor.server.status.pages)
+    implementation(libs.ktor.server.openapi)
+    implementation(libs.ktor.server.swagger)
     implementation(libs.ktor.server.html.builder)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.core)

@@ -159,6 +159,23 @@ class GameSession(val gameCode: String, gamConfig: GameConfig) {
     )
 
     @Synchronized
+    fun getGalaxy(): Result<GalaxyResponse> {
+        touch()
+        return when (state.phase) {
+            is GamePhase.Lobby -> Result.failure(Exception("Game not started yet"))
+            else -> Result.success(
+                GalaxyResponse(
+                    width = state.config.grid.width,
+                    height = state.config.grid.height,
+                    planets = state.planets.map {
+                        GalaxyPlanetDto(name = it.label.label, x = it.position.x, y = it.position.y)
+                    },
+                )
+            )
+        }
+    }
+
+    @Synchronized
     fun getScores(): Result<List<PlayerScore>> {
         touch()
         return when {

@@ -29,7 +29,7 @@ jobs:
       - uses: actions/upload-artifact@v6
         with:
           name: galkon-dist
-          path: server/build/distributions/server.zip
+          path: gk-server/build/distributions/server.zip
 
   deploy:
     needs: build

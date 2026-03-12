@@ -157,6 +157,20 @@ data class PlayerScoreDto(
     val score: Double,
 )
 
+@Serializable
+data class GalaxyPlanetDto(
+    val name: String,
+    val x: Int,
+    val y: Int,
+)
+
+@Serializable
+data class GalaxyResponse(
+    val width: Int,
+    val height: Int,
+    val planets: List<GalaxyPlanetDto>,
+)
+
 // ---- Conversion helpers ----
 
 fun Owner.toJson(): JsonElement = when (this) {

@@ -16,7 +16,7 @@ kotlin {
     sourceSets {
         jsMain {
             dependencies {
-                implementation(project(":common"))
+                implementation(project(":gk-common"))
                 implementation(libs.kotlinx.serialization.json)
                 implementation(libs.kotlinx.coroutines.core.js)
                 implementation(libs.kotlinx.html.js)
