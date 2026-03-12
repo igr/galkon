@@ -41,4 +41,5 @@ data class AppState(
     val sidebarVisible: Boolean = true,
     val rulesOpen: Boolean = false,
     val rulesHtml: String = "",
+    val filterMyPlanets: Boolean = false,
 )

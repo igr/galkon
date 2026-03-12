@@ -3,15 +3,32 @@ package galkon.client
 import kotlinx.browser.document
 import kotlinx.html.*
 import kotlinx.html.dom.create
+import kotlinx.html.js.onClickFunction
 import kotlinx.serialization.json.jsonPrimitive
 import org.w3c.dom.HTMLElement
 
 fun renderSidebar(state: AppState): HTMLElement = document.create.div("sidebar") {
-    h3 { +"PLANETS" }
+    div("sidebar-section-header") {
+        h3 { +"PLANETS" }
+        span("planet-filter-toggle") {
+            if (state.filterMyPlanets) {
+                +"[MINE]"
+            } else {
+                +"[ALL]"
+            }
+            onClickFunction = { updateState { copy(filterMyPlanets = !filterMyPlanets) } }
+        }
+    }
 
     val allocated = allocatedShips(state)
 
-    for (p in state.planets.sortedBy { it.label }) {
+    val planets = if (state.filterMyPlanets) {
+        state.planets.filter { ownerIsYou(it.owner) }
+    } else {
+        state.planets
+    }
+
+    for (p in planets.sortedBy { it.label }) {
         val isYou = ownerIsYou(p.owner)
         val isNeutral = p.owner.jsonPrimitive.content == "neutral"
         val cssClass = when {

@@ -296,7 +296,7 @@ private suspend fun pollState() {
                     turnEvents = state.turnEvents,
                     players = state.players,
                     ordersSubmitted = false,
-                    eventPlaybackIndex = 0,
+                    eventPlaybackIndex = -2,
                     seed = state.seed,
                 )
             }
@@ -324,18 +324,20 @@ private fun playEventAt(index: Int, events: List<TurnEventDto>) {
         return
     }
 
-    updateState { copy(eventPlaybackIndex = index) }
     val event = events[index]
 
     if (event.type == "battle") {
+        // Show battle sidebar before the event appears in the log
         updateState { copy(battleEvent = event) }
         battleContinuation = {
+            updateState { copy(eventPlaybackIndex = index) }
             window.setTimeout({
                 playEventAt(index + 1, events)
             }, 300)
         }
         startBattleAnimation(event)
     } else {
+        updateState { copy(eventPlaybackIndex = index) }
         window.setTimeout({
             playEventAt(index + 1, events)
         }, 300)

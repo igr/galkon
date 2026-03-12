@@ -14,8 +14,11 @@ fun renderEvents(state: AppState): HTMLElement = document.create.div("events") {
         return@div
     }
 
-    val visibleCount = if (state.eventPlaybackIndex < 0) state.turnEvents.size
-    else minOf(state.eventPlaybackIndex + 1, state.turnEvents.size)
+    val visibleCount = when {
+        state.eventPlaybackIndex == -1 -> state.turnEvents.size  // no playback, show all
+        state.eventPlaybackIndex < 0 -> 0  // playback starting, no events visible yet
+        else -> minOf(state.eventPlaybackIndex + 1, state.turnEvents.size)
+    }
 
     for (i in 0 until visibleCount) {
         renderEvent(state.turnEvents[i])

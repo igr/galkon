@@ -118,7 +118,7 @@ fun renderGalaxy(state: AppState): HTMLElement {
             fleetText.setAttribute("y", "$my")
             fleetText.setAttribute("text-anchor", "middle")
             fleetText.setAttribute("fill", Colors.ACCENT)
-            fleetText.setAttribute("font-size", "7")
+            fleetText.setAttribute("font-size", "5")
             fleetText.setAttribute("font-family", "Courier New, monospace")
             fleetText.textContent = "${fleet.ships}"
             svg.appendChild(fleetText)
