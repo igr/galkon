@@ -14,3 +14,13 @@ Based on GALCN220 by Analog Dial, itself based on GALCON24.EXE by Rick Raddatz (
 6. The player with the higher score after all turns wins.
 
 Full game rules: [galcon-rules.md](galcon-rules.md)
+
+## Screenshots
+
+Long time ago, in a galaxy far, far away:
+
+![Galaxy](etc/galaxy.png)
+
+One battle after another:
+
+![Battle](etc/battle.png)
