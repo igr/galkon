@@ -17,4 +17,5 @@ object Colors {
     const val BORDER_LIGHT = "#555"
     const val GRID_LINE = "#1a1a3e"
     const val NEUTRAL = "#888888"
+    const val BG_BATTLE = "#2a0a1a"
 }

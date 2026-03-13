@@ -40,11 +40,25 @@ fun renderGalaxy(state: AppState): HTMLElement {
     }
 
     // Render planets
+    val battlePlanetLabel = state.battleEvent?.planet
+
     for (planet in state.planets) {
         val cx = planet.x * state.spaceWidth + state.spaceWidth / 2
         val cy = planet.y * state.spaceHeight + state.spaceHeight / 2
         val color = ownerColor(planet.owner)
         val isSelected = planet.label == state.orderFrom || planet.label == state.orderTo
+
+        // Battle halo ring
+        if (planet.label == battlePlanetLabel) {
+            val halo = document.createElementNS(SVG_NS, "circle")
+            halo.setAttribute("cx", "$cx")
+            halo.setAttribute("cy", "$cy")
+            halo.setAttribute("r", "12")
+            halo.setAttribute("fill", "none")
+            halo.setAttribute("stroke", Colors.WARN)
+            halo.setAttribute("stroke-width", "4")
+            svg.appendChild(halo)
+        }
 
         // Planet circle
         val circle = document.createElementNS(SVG_NS, "circle")

@@ -24,3 +24,7 @@ Long time ago, in a galaxy far, far away:
 One battle after another:
 
 ![Battle](etc/battle.png)
+
+I'll be back... said Claude:
+
+![Claude](etc/win.png)
