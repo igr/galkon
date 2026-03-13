@@ -35,6 +35,7 @@ private fun HTML.dashboard(
     val now = System.currentTimeMillis()
     head {
         title { +"Galkon Dashboard" }
+        link(rel = "icon", type = "image/png", href = "/favicon.png")
         style {
             unsafe {
                 raw(CSS)
