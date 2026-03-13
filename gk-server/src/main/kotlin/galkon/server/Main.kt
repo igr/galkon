@@ -87,10 +87,9 @@ fun main() {
             description = "REST API for the Galkon space conquest game.",
         )
         routing {
-            get("/favicon.png") {
-                val bytes = object {}.javaClass.getResourceAsStream("/favicon.png")!!.readBytes()
-                call.respondBytes(bytes, ContentType.Image.PNG)
-            }
+            val faviconBytes = object {}.javaClass.getResourceAsStream("/favicon.png")!!.readBytes()
+            get("/favicon.png") { call.respondBytes(faviconBytes, ContentType.Image.PNG) }
+            get("/favicon.ico") { call.respondBytes(faviconBytes, ContentType.Image.PNG) }
             openAPI("openapi") { info = apiInfo }
             swaggerUI("docs") { info = apiInfo }
             gameRoutes(lobby)
