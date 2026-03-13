@@ -7,7 +7,7 @@ import io.ktor.server.html.*
 import io.ktor.server.routing.*
 import kotlinx.html.*
 
-fun Routing.dashboardRoutes(lobby: Lobby) {
+fun Route.dashboardRoutes(lobby: Lobby) {
 
     get("/dashboard") {
         val sessions = lobby.allSessions().map { it.snapshotStatus() to it.lastActivity }

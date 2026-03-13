@@ -37,6 +37,7 @@ Type=simple
 WorkingDirectory=/opt/galkon/server
 Environment=PORT=8080
 Environment=GALKON_ENV=production
+EnvironmentFile=-/opt/galkon/env
 ExecStart=/opt/galkon/server/bin/server
 Restart=on-failure
 RestartSec=5
@@ -55,3 +56,4 @@ echo "Setup complete. Configure GitHub secrets:"
 echo "  DEPLOY_HOST = <server IP>"
 echo "  DEPLOY_USER = root (or a deploy user)"
 echo "  DEPLOY_SSH_KEY = <private key content>"
+echo "  DASHBOARD_PASS = <dashboard password>"

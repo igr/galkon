@@ -46,6 +46,7 @@ jobs:
           SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
           HOST: ${{ secrets.DEPLOY_HOST }}
           USER: ${{ secrets.DEPLOY_USER }}
+          DASHBOARD_PASS: ${{ secrets.DASHBOARD_PASS }}
         run: |
           mkdir -p ~/.ssh
           echo "$SSH_KEY" > ~/.ssh/deploy_key
@@ -56,6 +57,7 @@ jobs:
           SCP="scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new"
 
           $SCP server.zip "${USER}@${HOST}:/tmp/galkon-dist.zip"
+          $SSH "printf 'DASHBOARD_PASS=%s\n' '${DASHBOARD_PASS}' > /opt/galkon/env && chmod 600 /opt/galkon/env"
           $SSH << 'EOF'
             set -e
             sudo systemctl stop galkon || true

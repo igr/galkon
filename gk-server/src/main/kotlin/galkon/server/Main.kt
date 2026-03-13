@@ -9,6 +9,7 @@ import io.ktor.server.engine.*
 import io.ktor.server.http.content.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.auth.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.openapi.*
 import io.ktor.server.plugins.statuspages.*
@@ -55,6 +56,20 @@ fun main() {
             allowMethod(HttpMethod.Options)
             allowHeader(HttpHeaders.ContentType)
         }
+        val dashUser = System.getenv("DASHBOARD_USER") ?: "admin"
+        val dashPass = System.getenv("DASHBOARD_PASS") ?: ""
+        if (dashPass.isNotEmpty()) {
+            install(Authentication) {
+                basic("dashboard") {
+                    realm = "Galkon Dashboard"
+                    validate { credentials ->
+                        if (credentials.name == dashUser && credentials.password == dashPass) {
+                            UserIdPrincipal(credentials.name)
+                        } else null
+                    }
+                }
+            }
+        }
         install(StatusPages) {
             exception<HttpException> { call, cause ->
                 call.respond(cause.status, galkon.common.ErrorResponse(cause.message))
@@ -75,7 +90,13 @@ fun main() {
             openAPI("openapi") { info = apiInfo }
             swaggerUI("docs") { info = apiInfo }
             gameRoutes(lobby)
-            dashboardRoutes(lobby)
+            if (dashPass.isNotEmpty()) {
+                authenticate("dashboard") {
+                    dashboardRoutes(lobby)
+                }
+            } else {
+                dashboardRoutes(lobby)
+            }
 
             // Serve client static files — try multiple locations
             // In distribution: JAR is in lib/, go up to distribution root
