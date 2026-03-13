@@ -3,9 +3,16 @@
 # Run as root: ssh root@galcon.top 'bash -s' < deploy/setup.sh
 set -euo pipefail
 
-# Install Java 21
+# Install Java 21 + unattended-upgrades
 apt-get update -qq
-apt-get install -y -qq openjdk-21-jre-headless unzip
+apt-get install -y -qq openjdk-21-jre-headless unzip unattended-upgrades apt-listchanges
+
+# Enable automatic security updates
+cat > /etc/apt/apt.conf.d/20auto-upgrades << 'EOF'
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Unattended-Upgrade "1";
+APT::Periodic::AutocleanInterval "7";
+EOF
 
 # Install Caddy
 apt-get install -y -qq debian-keyring debian-archive-keyring apt-transport-https curl
