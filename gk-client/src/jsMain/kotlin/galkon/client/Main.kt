@@ -47,7 +47,7 @@ fun showRules() {
 fun doCreateGame() {
     scope.launch {
         try {
-            val resp = apiCreateGame(currentState.serverUrl, currentState.inputSeed, currentState.inputNumPlanets)
+            val resp = apiCreateGame(currentState.serverUrl, currentState.inputSeed, currentState.inputNumPlanets, currentState.inputNumTurns)
             val joinResp = apiJoinGame(currentState.serverUrl, resp.gameCode, currentState.playerName.ifEmpty { "Player" })
             updateState {
                 copy(
@@ -204,6 +204,7 @@ private suspend fun pollStatus() {
                     screen = Screen.GAME,
                     gamePhase = p2,
                     currentTurn = t2,
+                    maxTurns = state.numTurns,
                     planets = state.planets,
                     fleets = state.fleets,
                     turnEvents = state.turnEvents,

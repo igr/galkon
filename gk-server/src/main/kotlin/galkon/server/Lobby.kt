@@ -9,7 +9,7 @@ import kotlin.random.Random
 class Lobby {
     private val sessions = ConcurrentHashMap<String, GameSession>()
 
-    fun createGame(seed: Long? = null, numPlanets: Int = 26): Result<String> {
+    fun createGame(seed: Long? = null, numPlanets: Int = 26, numTurns: Int = 40): Result<String> {
         if (sessions.size >= GameConfig.MAX_GAMES) {
             return Result.failure(Exception("Max games reached"))
         }
@@ -17,6 +17,7 @@ class Lobby {
         val config = GameConfig(
             seed = seed ?: Random.nextLong(),
             numPlanets = numPlanets.coerceIn(4, 36),
+            numTurns = numTurns.coerceIn(5, 50),
         )
         val session = GameSession(code, config)
         sessions[code] = session

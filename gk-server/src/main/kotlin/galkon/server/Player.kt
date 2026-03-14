@@ -40,6 +40,7 @@ fun PlayerView.toResponse(): PlayerViewResponse {
         spaceWidth = space.width,
         spaceHeight = space.height,
         seed = seed,
+        numTurns = numTurns,
         setupRound = (phase as? GamePhase.SetUp)?.round,
         setupMaxRounds = if (phase is GamePhase.SetUp) 3 else null,
     )

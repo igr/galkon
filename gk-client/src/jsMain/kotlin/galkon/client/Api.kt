@@ -31,8 +31,8 @@ private suspend fun fetchJson(url: String, method: String = "GET", body: String?
     return text
 }
 
-suspend fun apiCreateGame(serverUrl: String, seed: String = "", numPlanets: Int = 26): CreateGameResponse {
-    val body = GameJson.encodeToString(CreateGameRequest.serializer(), CreateGameRequest(seed, numPlanets))
+suspend fun apiCreateGame(serverUrl: String, seed: String = "", numPlanets: Int = 26, numTurns: Int = 40): CreateGameResponse {
+    val body = GameJson.encodeToString(CreateGameRequest.serializer(), CreateGameRequest(seed, numPlanets, numTurns))
     val text = fetchJson("$serverUrl/games", "POST", body)
     return GameJson.decodeFromString(text)
 }

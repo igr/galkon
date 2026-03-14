@@ -18,6 +18,7 @@ val GameJson = Json {
 data class CreateGameRequest(
     val seed: String = "",
     val numPlanets: Int = 26,
+    val numTurns: Int = 40,
 )
 
 @Serializable
@@ -96,6 +97,7 @@ data class PlayerViewResponse(
     val spaceWidth: Int,
     val spaceHeight: Int,
     val seed: String = "",
+    val numTurns: Int = 40,
     val setupRound: Int? = null,
     val setupMaxRounds: Int? = null,
 )

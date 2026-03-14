@@ -84,6 +84,21 @@ private fun renderLobby(state: AppState): HTMLElement = document.create.div("lob
                     }
                 }
             }
+            div("inline-field") {
+                label {
+                    htmlFor = "input-num-turns"
+                    +"Number of turns (5-50)"
+                }
+                textInput {
+                    id = "input-num-turns"
+                    value = "${state.inputNumTurns}"
+                    autoComplete = "off"
+                    onInputFunction = { e ->
+                        val v = (e.target as HTMLInputElement).value.toIntOrNull() ?: 40
+                        updateState { copy(inputNumTurns = v) }
+                    }
+                }
+            }
             textInput {
                 id = "input-seed"
                 value = state.inputSeed
@@ -162,7 +177,7 @@ private fun renderGame(state: AppState): HTMLElement = document.create.div("game
             if (state.gamePhase == "setup") {
                 span("turn-info") { +"Setup ${state.setupRound}/${state.setupMaxRounds}" }
             } else {
-                span("turn-info") { +"Turn: ${state.currentTurn}/40" }
+                span("turn-info") { +"Turn: ${state.currentTurn}/${state.maxTurns}" }
             }
             div("menu-wrapper") {
                 button(classes = "menu-btn") {

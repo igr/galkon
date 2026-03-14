@@ -147,10 +147,8 @@ private fun distance(x1: Int, y1: Int, x2: Int, y2: Int): Double {
     return kotlin.math.sqrt(dx * dx + dy * dy)
 }
 
-@Suppress("UNUSED_PARAMETER")
 private fun inferMaxTurns(view: PlayerViewResponse): Int {
-    // Default game config is 40 turns
-    return 40
+    return view.numTurns
 }
 
 private fun formatEvent(e: TurnEventDto, players: List<PlayerInfoDto>, @Suppress("UNUSED_PARAMETER") myId: String): String {

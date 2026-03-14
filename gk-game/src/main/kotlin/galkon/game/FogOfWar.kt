@@ -38,6 +38,7 @@ data class PlayerView(
     val grid: Dimension,
     val space: Dimension,
     val seed: String,
+    val numTurns: Int,
 )
 
 /** Generate a fog-of-war filtered view for a specific player. */
@@ -92,5 +93,6 @@ fun makePlayerView(state: GameState, playerId: PlayerId): PlayerView {
         grid = state.config.grid,
         space = state.config.space,
         seed = seedToString(state.config.seed),
+        numTurns = state.config.numTurns,
     )
 }
