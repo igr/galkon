@@ -149,13 +149,9 @@ body {
     }
 
     button { @extend %btn; }
-
-    .btn-cancel {
-        background: none;
-        border: 1px solid $border-light;
-        color: $text-dim;
-        margin-top: 10px;
-        &:hover { border-color: $danger; color: $danger; }
+    .btn-disagree {
+        background: $danger;
+        &:hover { background: color.adjust($danger, $lightness: -10%); }
     }
 }
 
@@ -174,12 +170,25 @@ body {
 }
 
 .game button { @extend %btn; }
+.game .btn-disagree {
+    background: $danger;
+    &:hover { background: color.adjust($danger, $lightness: -10%); }
+}
 
 .game-code {
     font-size: 2em;
     color: $accent;
     letter-spacing: 4px;
     margin: 10px 0;
+}
+
+.copy-link {
+    display: inline-block;
+    color: $text-dim;
+    font-size: 0.8em;
+    cursor: pointer;
+    margin-bottom: 10px;
+    &:hover { color: $accent; }
 }
 
 .player-list {
@@ -514,20 +523,27 @@ body {
         .warn { color: $warn; font-size: 0.85em; }
     }
 
-    .vote-buttons {
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-    }
-
-    .btn-agree { @extend %btn; }
-    .btn-disagree {
-        @extend %btn;
-        background: $danger;
-        &:hover { background: color.adjust($danger, $lightness: -10%); }
-    }
-
     .waiting { color: $text-dim; font-style: italic; }
+}
+
+.vote-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.btn-agree { @extend %btn; }
+.btn-disagree {
+    color: $bg-dark;
+    border: none;
+    padding: 8px 16px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    cursor: pointer;
+    font-weight: bold;
+    background: $danger;
+    &:hover { background: color.adjust($danger, $lightness: -10%); }
+    &:disabled { background: $border-light; color: $text-dim; cursor: not-allowed; }
 }
 
 /* Event log */

@@ -1,6 +1,5 @@
 package galkon.client
 
-import galkon.common.*
 import kotlinx.browser.document
 import kotlinx.html.*
 import kotlinx.html.dom.create
@@ -112,6 +111,12 @@ private fun renderLobby(state: AppState): HTMLElement = document.create.div("lob
         div("section") {
             h2 { +"Game Code" }
             div("game-code") { +state.gameCode }
+            a(classes = "copy-link") {
+                +"[copy code]"
+                onClickFunction = {
+                    kotlinx.browser.window.navigator.clipboard.writeText(state.gameCode)
+                }
+            }
 
             h2 { +"Players" }
             div("player-list") {
@@ -121,14 +126,19 @@ private fun renderLobby(state: AppState): HTMLElement = document.create.div("lob
             }
 
             if (state.players.firstOrNull()?.id == state.playerId) {
-                button { +"Start Game"; onClickFunction = { doStartGame() } }
+                div("vote-buttons") {
+                    button(classes = "btn-agree") { +"Start Game"; onClickFunction = { doStartGame() } }
+                    button(classes = "btn-disagree") { +"Cancel"; onClickFunction = { doCancelGame() } }
+                }
             } else {
                 div {
                     +"Waiting for host to start..."
                     style = "color: ${Colors.TEXT_DIM}; margin-top: 10px"
                 }
+                div("vote-buttons") {
+                    button(classes = "btn-disagree") { +"Cancel"; onClickFunction = { doCancelGame() } }
+                }
             }
-            button(classes = "btn-cancel") { +"Cancel"; onClickFunction = { doCancelGame() } }
         }
     }
 
