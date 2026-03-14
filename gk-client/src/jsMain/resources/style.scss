@@ -107,6 +107,25 @@ body {
 
         h2 { color: $accent; font-size: 1em; margin-bottom: 10px; }
 
+        .inline-field {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+
+            label {
+                color: $text-dim;
+                font-size: 0.85em;
+                white-space: nowrap;
+            }
+
+            input {
+                width: 50px;
+                text-align: center;
+                margin-bottom: 0;
+            }
+        }
+
         summary {
             color: $text-dim;
             font-size: 0.9em;

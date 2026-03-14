@@ -28,6 +28,7 @@ data class AppState(
     val pendingOrders: List<FleetOrderDto> = emptyList(),
     val ordersSubmitted: Boolean = false,
     val scores: List<PlayerScoreDto> = emptyList(),
+    val inputNumPlanets: Int = 26,
     val inputSeed: String = "",
     val seed: String = "",
     val setupRound: Int = 0,

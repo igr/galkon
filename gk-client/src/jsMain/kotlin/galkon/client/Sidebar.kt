@@ -1,5 +1,6 @@
 package galkon.client
 
+import galkon.common.PlanetId
 import kotlinx.browser.document
 import kotlinx.html.*
 import kotlinx.html.dom.create
@@ -28,7 +29,7 @@ fun renderSidebar(state: AppState): HTMLElement = document.create.div("sidebar")
         state.planets
     }
 
-    for (p in planets.sortedBy { it.label }) {
+    for (p in planets.sortedBy { PlanetId(it.label) }) {
         val isYou = ownerIsYou(p.owner)
         val isNeutral = p.owner.jsonPrimitive.content == "neutral"
         val cssClass = when {

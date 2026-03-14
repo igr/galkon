@@ -17,6 +17,7 @@ val GameJson = Json {
 @Serializable
 data class CreateGameRequest(
     val seed: String = "",
+    val numPlanets: Int = 26,
 )
 
 @Serializable

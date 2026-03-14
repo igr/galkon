@@ -58,7 +58,7 @@ fun Routing.gameRoutes(lobby: Lobby) {
         val req = call.receive<CreateGameRequest>()
         val seed = if (req.seed.isNotEmpty()) stringToSeed(req.seed) else null
         call.respondResult(
-            lobby.createGame(seed).map { CreateGameResponse(it) },
+            lobby.createGame(seed, req.numPlanets).map { CreateGameResponse(it) },
             HttpStatusCode.Created,
         )
     }

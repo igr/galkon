@@ -70,6 +70,21 @@ private fun renderLobby(state: AppState): HTMLElement = document.create.div("lob
         // Create game
         div("section") {
             h2 { +"Create New Game" }
+            div("inline-field") {
+                label {
+                    htmlFor = "input-num-planets"
+                    +"Number of planets (4-36)"
+                }
+                textInput {
+                    id = "input-num-planets"
+                    value = "${state.inputNumPlanets}"
+                    autoComplete = "off"
+                    onInputFunction = { e ->
+                        val v = (e.target as HTMLInputElement).value.toIntOrNull() ?: 26
+                        updateState { copy(inputNumPlanets = v) }
+                    }
+                }
+            }
             textInput {
                 id = "input-seed"
                 value = state.inputSeed

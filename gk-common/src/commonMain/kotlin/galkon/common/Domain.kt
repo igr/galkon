@@ -3,21 +3,35 @@ package galkon.common
 import kotlin.jvm.JvmInline
 import kotlin.random.Random
 
-/** Validated planet identifier — single character A-Z or 0-9. */
-data class PlanetId(val label: String) {
+/** Validated planet identifier — single character A-Z or 0-9.
+ *  Natural ordering: A-Z first, then 0-9. */
+data class PlanetId(val label: String) : Comparable<PlanetId> {
     init {
         require(label.length == 1 && label[0] in VALID_CHARS) {
             "Invalid planet label: $label"
         }
     }
 
+    /**
+     * Natural ordering: A-Z first, then 0-9.
+     * This ensures that planets are sorted in a consistent and intuitive way,
+     */
+    override fun compareTo(other: PlanetId): Int {
+        val a = label[0]
+        val b = other.label[0]
+        val aIsDigit = a.isDigit()
+        val bIsDigit = b.isDigit()
+        if (aIsDigit != bIsDigit) return if (aIsDigit) 1 else -1
+        return a.compareTo(b)
+    }
+
     override fun toString() = label
 
     companion object {
-        // todo not correct if number of planets > 36, but good enough for now
+        // to do not correct if number of planets > 36, but good enough for now
         private val VALID_CHARS = ('A'..'Z') + ('0'..'9')
 
-        val ALL_LABELS: List<PlanetId> = VALID_CHARS.map { PlanetId(it.toString()) }
+        val ALL_LABELS: List<PlanetId> = VALID_CHARS.map { PlanetId(it.toString()) }.sorted()
     }
 }
 
