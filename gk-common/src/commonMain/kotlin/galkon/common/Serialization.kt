@@ -137,7 +137,9 @@ data class TurnEventDto(
     val conquered: Boolean? = null,
     val formerOwner: String? = null,
     val turn: Int? = null,
+    val oldProduction: Int? = null,
     val newProduction: Int? = null,
+    val oldKillRatio: Int? = null,
     val newKillRatio: Int? = null,
     val owner: String? = null,
     val attackerKillRatio: Int? = null,
@@ -239,11 +241,11 @@ fun TurnEvent.toDto(): TurnEventDto = when (this) {
     )
     is TurnEvent.EventProductionChanged -> TurnEventDto(
         type = "event_production_changed", planet = planet.label,
-        owner = owner.value, newProduction = newProduction.value,
+        owner = owner.value, oldProduction = oldProduction.value, newProduction = newProduction.value,
     )
     is TurnEvent.EventKillRatioChanged -> TurnEventDto(
         type = "event_kill_ratio_changed", planet = planet.label,
-        owner = owner.value, newKillRatio = newKillRatio.value,
+        owner = owner.value, oldKillRatio = oldKillRatio.value, newKillRatio = newKillRatio.value,
     )
     is TurnEvent.EventRevoltThwarted -> TurnEventDto(
         type = "event_revolt_thwarted", planet = planet.label,

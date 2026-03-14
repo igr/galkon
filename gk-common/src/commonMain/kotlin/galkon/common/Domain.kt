@@ -161,8 +161,8 @@ sealed interface TurnEvent {
     data class PlanetRevolted(val planet: PlanetId, val formerOwner: PlayerId) : TurnEvent
     data class ProductionCompleted(val player: PlayerId, val planet: PlanetId, val ships: ShipCount) : TurnEvent
     data class TurnStarted(val turn: Int) : TurnEvent
-    data class EventProductionChanged(val planet: PlanetId, val owner: PlayerId, val newProduction: ShipCount) : TurnEvent
-    data class EventKillRatioChanged(val planet: PlanetId, val owner: PlayerId, val newKillRatio: KillRatio) : TurnEvent
+    data class EventProductionChanged(val planet: PlanetId, val owner: PlayerId, val oldProduction: ShipCount, val newProduction: ShipCount) : TurnEvent
+    data class EventKillRatioChanged(val planet: PlanetId, val owner: PlayerId, val oldKillRatio: KillRatio, val newKillRatio: KillRatio) : TurnEvent
     data class EventRevoltThwarted(val planet: PlanetId, val owner: PlayerId) : TurnEvent
 }
 

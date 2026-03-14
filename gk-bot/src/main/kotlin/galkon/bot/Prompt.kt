@@ -164,8 +164,14 @@ private fun formatEvent(e: TurnEventDto, players: List<PlayerInfoDto>, @Suppress
         }
         "revolt" -> "Planet ${e.planet} revolted against ${name(e.formerOwner)}!"
         "production" -> "Production at ${e.planet}: +${e.ships} ships"
-        "event_production_changed" -> "Event: production at ${e.planet} changed to ${e.newProduction}"
-        "event_kill_ratio_changed" -> "Event: kill ratio at ${e.planet} changed to ${e.newKillRatio}%"
+        "event_production_changed" -> {
+            val dir = if ((e.newProduction ?: 0) > (e.oldProduction ?: 0)) "increased" else "decreased"
+            "Event: production at ${e.planet} $dir to ${e.newProduction}"
+        }
+        "event_kill_ratio_changed" -> {
+            val dir = if ((e.newKillRatio ?: 0) > (e.oldKillRatio ?: 0)) "increased" else "decreased"
+            "Event: kill ratio at ${e.planet} $dir to ${e.newKillRatio}%"
+        }
         "event_revolt_thwarted" -> "Revolt thwarted at ${e.planet}"
         else -> "${e.type}: $e"
     }

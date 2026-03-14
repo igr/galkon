@@ -29,7 +29,7 @@ internal fun maybeFireEvent(state: GameState): TurnEvent? {
                 else -> ShipCount(maxOf(0, planet.production.value - change))
             }
             state.planets.update(planet.label) { it.copy(production = newProd) }
-            TurnEvent.EventProductionChanged(planet.label, owner.id, newProd)
+            TurnEvent.EventProductionChanged(planet.label, owner.id, planet.production, newProd)
         }
 
         roll > 33 -> {
@@ -41,7 +41,7 @@ internal fun maybeFireEvent(state: GameState): TurnEvent? {
                 else -> (planet.killRatio - change).coerceAtLeast(ZERO)
             }
             state.planets.update(planet.label) { it.copy(killRatio = newKill) }
-            TurnEvent.EventKillRatioChanged(planet.label, owner.id, newKill)
+            TurnEvent.EventKillRatioChanged(planet.label, owner.id, planet.killRatio, newKill)
         }
 
         roll > 1 -> {

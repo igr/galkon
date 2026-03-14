@@ -39,8 +39,16 @@ private fun FlowContent.renderEvent(event: TurnEventDto) {
         "revolt" -> "warn" to "> Planet ${event.planet} revolted!"
         "production" -> "good" to "> Production at ${event.planet}: +${event.ships} ships"
         "turn_started" -> "turn-marker" to "--- Turn ${event.turn} ---"
-        "event_production_changed" -> "warn" to "> Planet ${event.planet}: production changed to ${event.newProduction}"
-        "event_kill_ratio_changed" -> "warn" to "> Planet ${event.planet}: kill ratio changed to ${event.newKillRatio}%"
+        "event_production_changed" -> {
+            val increased = (event.newProduction ?: 0) > (event.oldProduction ?: 0)
+            if (increased) "good" to "> Strong Economy: Planet ${event.planet} production rate increases to ${event.newProduction}"
+            else "bad" to "> Morale Falls: Planet ${event.planet} production rate decreases to ${event.newProduction}"
+        }
+        "event_kill_ratio_changed" -> {
+            val increased = (event.newKillRatio ?: 0) > (event.oldKillRatio ?: 0)
+            if (increased) "bad" to "> Kill% Increase: Planet ${event.planet} kill percentage goes up to ${event.newKillRatio}%"
+            else "good" to "> Bad Ammo: Planet ${event.planet} kill percentage decreases to ${event.newKillRatio}%"
+        }
         "event_revolt_thwarted" -> "neutral-event" to "> A revolt on planet ${event.planet} has been thwarted"
         else -> "neutral-event" to "> ${event.type}"
     }
