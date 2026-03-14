@@ -19,7 +19,16 @@ private suspend fun fetchJson(url: String, method: String = "GET", body: String?
         init.body = body
     }
     val response = kotlinx.browser.window.fetch(url, init).await()
-    return response.text().await()
+    val text = response.text().await()
+    if (!response.ok) {
+        val msg = try {
+            GameJson.decodeFromString<ErrorResponse>(text).error
+        } catch (_: Exception) {
+            text
+        }
+        throw Exception(msg)
+    }
+    return text
 }
 
 suspend fun apiCreateGame(serverUrl: String, seed: String = "", numPlanets: Int = 26): CreateGameResponse {
