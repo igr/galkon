@@ -171,7 +171,7 @@ data class PlayerScore(
     val player: PlayerInfo,
     val planetsOwned: Int,
     val totalShips: ShipCount,
-    val score: Double,
+    val score: Int,
 )
 
 /** Player info for status/lobby display. */

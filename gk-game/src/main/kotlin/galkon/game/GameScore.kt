@@ -15,7 +15,7 @@ fun calculateScores(state: GameState): List<PlayerScore> =
         val ownedPlanets = state.planets.filter { playerId.ownsPlanet(it) }
         when (ownedPlanets.size) {
             0 -> {
-                PlayerScore(playerInfo, 0, ShipCount.ZERO, 0.0)
+                PlayerScore(playerInfo, 0, ShipCount.ZERO, 0)
             }
             else -> {
                 score(ownedPlanets, playerInfo)
@@ -31,7 +31,7 @@ private fun score(
     val planetShips = ownedPlanets.sumShips { it.ships }
     val totalKillRatio = ownedPlanets.sumOf { it.killRatio.value }
     val averageKill = totalKillRatio.toDouble() / planetsOwned
-    val score = ((averageKill * planetShips.value / 8.0).toInt() + planetsOwned * 50).toDouble()
+    val score = ((averageKill * planetShips.value / 8.0).toInt() + planetsOwned * 50)
 
     return PlayerScore(playerInfo, planetsOwned, planetShips, score)
 }

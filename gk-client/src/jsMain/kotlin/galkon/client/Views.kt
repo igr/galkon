@@ -284,7 +284,7 @@ private fun renderScores(state: AppState): HTMLElement = document.create.div("sc
                     td { +s.playerName }
                     td { +"${s.planetsOwned}" }
                     td { +"${s.totalShips}" }
-                    td { +s.score.toFixed(0) }
+                    td { s.score }
                 }
             }
         }

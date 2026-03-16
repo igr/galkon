@@ -159,7 +159,7 @@ data class PlayerScoreDto(
     val playerName: String,
     val planetsOwned: Int,
     val totalShips: Int,
-    val score: Double,
+    val score: Int,
 )
 
 @Serializable
