@@ -22,6 +22,19 @@ class ApiClient(private val baseUrl: String) {
         }
     }
 
+    suspend fun createGame(numPlanets: Int = 26, numTurns: Int = 40): CreateGameResponse =
+        http.post("$baseUrl/games") {
+            contentType(ContentType.Application.Json)
+            setBody(CreateGameRequest(numPlanets = numPlanets, numTurns = numTurns))
+        }.body()
+
+    suspend fun startGame(gameCode: String, playerId: String) {
+        http.post("$baseUrl/games/$gameCode/start") {
+            contentType(ContentType.Application.Json)
+            setBody(StartGameRequest(playerId))
+        }.assertSuccess()
+    }
+
     suspend fun join(gameCode: String, playerName: String): JoinGameResponse =
         http.post("$baseUrl/games/$gameCode/join") {
             contentType(ContentType.Application.Json)

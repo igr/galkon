@@ -22,9 +22,13 @@ server:
 common:
     ./gradlew :gk-common:build
 
-# Run bot: just bot <gameCode> [serverUrl]
-bot *args:
-    ./gradlew :gk-bot:run --console=plain --args="{{args}}"
+# Run bot that joins existing game: just bot-join <gameCode>
+bot-join gameCode:
+    ./gradlew :gk-bot:run --console=plain --args="{{gameCode}}"
+
+# Run bot that creates its own game
+bot-create:
+    ./gradlew :gk-bot:run --console=plain --args="--create"
 
 # Clean all build artifacts
 clean:
