@@ -28,3 +28,30 @@ One battle after another:
 I'll be back... said Claude:
 
 ![Claude](etc/win.png)
+
+## Make them fight!
+
+How to run two bots against each other and spectate the game.
+
+Open three terminals.
+
+Terminal 1, run the server:
+
+```bash
+just build run
+```
+
+Terminal 2, start the bot:
+
+```bash
+just bot-start
+```
+Bot will create a game and print out the game code. Copy that code.
+
+Terminal 3, join the game with another bot:
+
+```bash
+just bot-join <game-code>
+```
+
+Now, both bots will play against each other. Watch the game joining as _spectator_ at http://localhost:8080/
