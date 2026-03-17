@@ -6,28 +6,62 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonPrimitive
 
-private const val BOT_NAME = "ClaudeBot"
+private val BOT_NAME = "Claude-$botCode"
 
 fun main(args: Array<String>) {
-    if (args.isEmpty()) {
+    val create = args.firstOrNull() == "--create"
+    val positionalArgs = if (create) args.drop(1) else args.toList()
+
+    if (!create && positionalArgs.isEmpty()) {
         System.err.println("Usage: gk-bot <gameCode> [serverUrl]")
+        System.err.println("       gk-bot --create [serverUrl]")
         System.err.println("  serverUrl defaults to http://localhost:8080")
         kotlin.system.exitProcess(1)
     }
 
-    val gameCode = args[0]
-    val serverUrl = args.getOrElse(1) { "http://localhost:8080" }
+    val serverUrl = if (create) {
+        positionalArgs.firstOrNull() ?: "http://localhost:8080"
+    } else {
+        positionalArgs.getOrElse(1) { "http://localhost:8080" }
+    }
 
     val api = ApiClient(serverUrl)
 
     runBlocking {
         try {
-            println("=== Galkon Bot ===")
-            println("Joining game $gameCode as $BOT_NAME...")
+            println("=== Galkon Bot ($BOT_NAME) ===")
 
-            val playerId = api.join(gameCode, BOT_NAME).playerId
+            val gameCode: String
+            val playerId: String
 
-            println("Joined! Player ID: $playerId")
+            if (create) {
+                println("Creating new game...")
+                val resp = api.createGame()
+                gameCode = resp.gameCode
+                println("Game created: $gameCode")
+
+                val joinResp = api.join(gameCode, BOT_NAME)
+                playerId = joinResp.playerId
+                println("Joined as host! Player ID: $playerId")
+                println("Waiting for other players to join...")
+
+                while (true) {
+                    val status = api.status(gameCode)
+                    if (status.players.size >= 2) {
+                        api.startGame(gameCode, playerId)
+                        println("Game started with ${status.players.size} players!")
+                        break
+                    }
+                    delay(2000)
+                }
+            } else {
+                gameCode = positionalArgs[0]
+                println("Joining game $gameCode as $BOT_NAME...")
+                val joinResp = api.join(gameCode, BOT_NAME)
+                playerId = joinResp.playerId
+                println("Joined! Player ID: $playerId")
+            }
+
             println("Server: $serverUrl")
             println()
 

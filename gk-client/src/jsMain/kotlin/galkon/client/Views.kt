@@ -119,8 +119,10 @@ private fun renderLobby(state: AppState): HTMLElement = document.create.div("lob
                 autoComplete = "off"
                 onInputFunction = { e -> updateState { copy(gameCode = (e.target as HTMLInputElement).value.uppercase()) } }
             }
-            button { +"Join Game"; onClickFunction = { doJoinGame() } }
-            button { +"Spectate"; onClickFunction = { doSpectateGame() } }
+            div("vote-buttons") {
+                button(classes = "btn-agree") { +"Join Game"; onClickFunction = { doJoinGame() } }
+                button(classes = "btn-disagree") { +"Spectate"; onClickFunction = { doSpectateGame() } }
+            }
         }
     } else {
         // Waiting room

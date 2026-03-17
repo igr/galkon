@@ -4,6 +4,7 @@ import galkon.common.FleetOrderDto
 import java.io.File
 
 private var turnCounter = 0
+val botCode = "%05d".format(System.currentTimeMillis() % 100000)
 
 /**
  * Writes the prompt to a file and executes Claude Code CLI referencing it.
@@ -12,8 +13,8 @@ private var turnCounter = 0
 fun askClaude(gameCode: String, prompt: String): String {
     turnCounter++
     val botDir = File("bot").apply { mkdirs() }
-    val promptFile = File(botDir, "$gameCode-$turnCounter.md")
-    val outputFile = File(botDir, "$gameCode-$turnCounter-out.md")
+    val promptFile = File(botDir, "$gameCode-$botCode-$turnCounter.md")
+    val outputFile = File(botDir, "$gameCode-$botCode-$turnCounter-out.md")
     promptFile.writeText(prompt)
 
     val process = ProcessBuilder(
