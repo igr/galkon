@@ -120,6 +120,7 @@ private fun renderLobby(state: AppState): HTMLElement = document.create.div("lob
                 onInputFunction = { e -> updateState { copy(gameCode = (e.target as HTMLInputElement).value.uppercase()) } }
             }
             button { +"Join Game"; onClickFunction = { doJoinGame() } }
+            button { +"Spectate"; onClickFunction = { doSpectateGame() } }
         }
     } else {
         // Waiting room
@@ -174,6 +175,9 @@ private fun renderGame(state: AppState): HTMLElement = document.create.div("game
     div("header") {
         h1 { +"GALKON - Game: ${state.gameCode}" }
         div("header-right") {
+            if (state.isSpectator) {
+                span("turn-info") { +"Spectating" }
+            }
             if (state.gamePhase == "setup") {
                 span("turn-info") { +"Setup ${state.setupRound}/${state.setupMaxRounds}" }
             } else {
@@ -217,7 +221,9 @@ private fun renderGame(state: AppState): HTMLElement = document.create.div("game
         }
     }
 
-    if (state.gamePhase == "setup") {
+    if (state.isSpectator) {
+        div.appendChild(renderEvents(state))
+    } else if (state.gamePhase == "setup") {
         div.appendChild(renderSetupVoteBar(state))
     } else {
         div.appendChild(renderOrders(state))

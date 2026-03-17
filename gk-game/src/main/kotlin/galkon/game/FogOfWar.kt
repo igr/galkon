@@ -41,6 +41,25 @@ data class PlayerView(
     val numTurns: Int,
 )
 
+/** Generate a full view for spectators (no fog of war). */
+fun makeSpectatorView(state: GameState): PlayerView {
+    val viewPlanets = state.planets.map { p ->
+        ViewPlanet.Visible(p.label, p.position, p.owner, p.ships, p.production, p.killRatio)
+    }
+    return PlayerView(
+        phase = state.phase,
+        turn = state.currentTurn,
+        planets = viewPlanets,
+        fleets = state.fleets.toList(),
+        turnEvents = state.turnEvents.toList(),
+        players = state.players.values.toList(),
+        grid = state.config.grid,
+        space = state.config.space,
+        seed = seedToString(state.config.seed),
+        numTurns = state.config.numTurns,
+    )
+}
+
 /** Generate a fog-of-war filtered view for a specific player. */
 fun makePlayerView(state: GameState, playerId: PlayerId): PlayerView {
     val currentTurn = state.currentTurn

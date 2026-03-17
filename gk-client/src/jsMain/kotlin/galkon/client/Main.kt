@@ -80,6 +80,46 @@ fun doJoinGame() {
     }
 }
 
+fun doSpectateGame() {
+    scope.launch {
+        try {
+            val resp = apiSpectateGame(currentState.serverUrl, currentState.gameCode)
+            updateState {
+                copy(
+                    playerId = resp.playerId,
+                    isSpectator = true,
+                    error = "",
+                )
+            }
+            // Spectator goes straight to game, fetch initial state
+            val state = apiGetState(currentState.serverUrl, currentState.gameCode, resp.playerId)
+            val (phase, turn) = parsePhase(state.phase)
+            updateState {
+                copy(
+                    screen = Screen.GAME,
+                    gamePhase = phase,
+                    currentTurn = turn,
+                    maxTurns = state.numTurns,
+                    planets = state.planets,
+                    fleets = state.fleets,
+                    turnEvents = state.turnEvents,
+                    players = state.players,
+                    gridWidth = state.gridWidth,
+                    gridHeight = state.gridHeight,
+                    spaceWidth = state.spaceWidth,
+                    spaceHeight = state.spaceHeight,
+                    seed = state.seed,
+                    setupRound = state.setupRound ?: 0,
+                    setupMaxRounds = state.setupMaxRounds ?: 3,
+                )
+            }
+            startPollingState()
+        } catch (e: Exception) {
+            updateState { copy(error = e.message ?: "Failed to spectate game") }
+        }
+    }
+}
+
 fun doCancelGame() {
     scope.launch {
         try {
@@ -282,11 +322,12 @@ private suspend fun pollState() {
                     ordersSubmitted = false,
                 )
             }
+            if (currentState.isSpectator) startPollingState()
             return
         }
 
         // Check if turn advanced (turn resolution happened)
-        if (turn > currentState.currentTurn && currentState.ordersSubmitted) {
+        if (turn > currentState.currentTurn && (currentState.ordersSubmitted || currentState.isSpectator)) {
             stopPolling()
             updateState {
                 copy(
@@ -303,6 +344,15 @@ private suspend fun pollState() {
             }
             // Play back events with delay
             playEvents()
+        } else if (currentState.isSpectator && turn == currentState.currentTurn) {
+            // Spectator: keep state fresh between turns
+            updateState {
+                copy(
+                    planets = state.planets,
+                    fleets = state.fleets,
+                    players = state.players,
+                )
+            }
         }
     } catch (e: Exception) {
         // Silently ignore poll errors
@@ -315,13 +365,17 @@ private var battleContinuation: (() -> Unit)? = null
 
 private fun playEvents() {
     val events = currentState.turnEvents
-    if (events.isEmpty()) return
+    if (events.isEmpty()) {
+        if (currentState.isSpectator) startPollingState()
+        return
+    }
     playEventAt(0, events)
 }
 
 private fun playEventAt(index: Int, events: List<TurnEventDto>) {
     if (index >= events.size) {
         updateState { copy(eventPlaybackIndex = events.size, battleEvent = null) }
+        if (currentState.isSpectator) startPollingState()
         return
     }
 
