@@ -32,11 +32,7 @@ fun renderSidebar(state: AppState): HTMLElement = document.create.div("sidebar")
     for (p in planets.sortedBy { PlanetId(it.label) }) {
         val isYou = ownerIsYou(p.owner)
         val isNeutral = p.owner.jsonPrimitive.content == "neutral"
-        val cssClass = when {
-            isYou -> "planet-row mine"
-            isNeutral -> "planet-row neutral"
-            else -> "planet-row enemy"
-        }
+        val color = ownerColor(p.owner)
         val ownerPrefix = if (!isYou && !isNeutral) "${shortName(ownerName(p.owner))} " else ""
         val detail = run {
             val ships: Int = p.ships ?: return@run ownerName(p.owner)
@@ -44,7 +40,8 @@ fun renderSidebar(state: AppState): HTMLElement = document.create.div("sidebar")
             val displayShips = if (isYou && pending > 0) "${ships - pending}/$ships" else "$ships"
             "${ownerPrefix}S:$displayShips P:${p.production ?: "?"}  K:${p.killRatio ?: "?"}"
         }
-        div(cssClass) {
+        div("planet-row") {
+            style = "color: $color"
             span("label") { +p.label }
             span { +detail }
         }

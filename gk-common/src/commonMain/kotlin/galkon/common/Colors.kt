@@ -6,6 +6,18 @@ object Colors {
     const val ACCENT_ALPHA = "#00ff8844"
     const val DANGER = "#ff4444"
     const val WARN = "#ffaa00"
+
+    /** Vivid player colors indexed by player position (0-7). */
+    val PLAYER = listOf(
+        "#00ff88",  // green
+        "#ff4444",  // red
+        "#ffcc00",  // yellow
+        "#ff6600",  // orange
+        "#ff00ff",  // magenta
+        "#00ffcc",  // cyan
+        "#aa44ff",  // purple
+        "#ff6688",  // pink
+    )
     const val TEXT = "#e0e0e0"
     const val TEXT_MUTED = "#aaa"
     const val TEXT_DIM = "#888"

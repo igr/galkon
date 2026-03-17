@@ -113,16 +113,18 @@ fun renderGalaxy(state: AppState): HTMLElement {
             val y1 = fromPlanet.y * state.spaceHeight + state.spaceHeight / 2
             val x2 = toPlanet.x * state.spaceWidth + state.spaceWidth / 2
             val y2 = toPlanet.y * state.spaceHeight + state.spaceHeight / 2
-            // Draw midpoint indicator
             val mx = (x1 + x2) / 2
             val my = (y1 + y2) / 2
+
+            val fleetIndex = state.players.indexOfFirst { it.id == fleet.owner }
+            val fleetColor = if (fleetIndex >= 0) Colors.PLAYER[fleetIndex % Colors.PLAYER.size] else Colors.NEUTRAL
 
             val line = document.createElementNS(SVG_NS, "line")
             line.setAttribute("x1", "$x1")
             line.setAttribute("y1", "$y1")
             line.setAttribute("x2", "$x2")
             line.setAttribute("y2", "$y2")
-            line.setAttribute("stroke", Colors.ACCENT_ALPHA)
+            line.setAttribute("stroke", fleetColor + "44")
             line.setAttribute("stroke-width", "1")
             line.setAttribute("stroke-dasharray", "4,4")
             svg.appendChild(line)
@@ -131,7 +133,7 @@ fun renderGalaxy(state: AppState): HTMLElement {
             fleetText.setAttribute("x", "$mx")
             fleetText.setAttribute("y", "$my")
             fleetText.setAttribute("text-anchor", "middle")
-            fleetText.setAttribute("fill", Colors.ACCENT)
+            fleetText.setAttribute("fill", fleetColor)
             fleetText.setAttribute("font-size", "5")
             fleetText.setAttribute("font-family", "Courier New, monospace")
             fleetText.textContent = "${fleet.ships}"

@@ -331,11 +331,10 @@ private fun Double.toFixed(digits: Int): String = asDynamic().toFixed(digits) as
 // ---- Utility ----
 
 fun ownerColor(owner: kotlinx.serialization.json.JsonElement): String {
-    val prim = owner.jsonPrimitive
-    val content = prim.content
-    return if (content == "neutral") Colors.NEUTRAL
-    else if (content == currentState.playerId) Colors.ACCENT
-    else Colors.DANGER
+    val content = owner.jsonPrimitive.content
+    if (content == "neutral") return Colors.NEUTRAL
+    val index = currentState.players.indexOfFirst { it.id == content }
+    return if (index >= 0) Colors.PLAYER[index % Colors.PLAYER.size] else Colors.NEUTRAL
 }
 
 fun ownerName(owner: kotlinx.serialization.json.JsonElement): String {
