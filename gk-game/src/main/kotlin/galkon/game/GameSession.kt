@@ -12,6 +12,9 @@ class GameSession(val gameCode: String, gamConfig: GameConfig) {
     /** The first player to join is the host. */
     private var hostId: PlayerId? = null
 
+    /** Spectator IDs (not real players). */
+    private val spectators = mutableSetOf<PlayerId>()
+
     @Volatile
     var lastActivity: Long = System.currentTimeMillis()
         private set
@@ -129,13 +132,24 @@ class GameSession(val gameCode: String, gamConfig: GameConfig) {
     }
 
     @Synchronized
+    fun spectate(): Result<PlayerId> {
+        touch()
+        return when (state.phase) {
+            is GamePhase.Lobby -> Result.failure(Exception("Game has not started yet"))
+            else -> {
+                val spectatorId = PlayerId(UUID.randomUUID().toString())
+                spectators.add(spectatorId)
+                Result.success(spectatorId)
+            }
+        }
+    }
+
+    @Synchronized
     fun getState(playerId: PlayerId): Result<PlayerView> {
         touch()
-        return when (playerId) {
-            !in state.players -> {
-                Result.failure(Exception("Invalid player"))
-            }
-
+        return when {
+            playerId in spectators -> Result.success(makeSpectatorView(state))
+            playerId !in state.players -> Result.failure(Exception("Invalid player"))
             else -> Result.success(makePlayerView(state, playerId))
         }
     }

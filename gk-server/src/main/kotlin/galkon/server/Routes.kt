@@ -86,6 +86,27 @@ fun Routing.gameRoutes(lobby: Lobby) {
     }
 
     /**
+     * Spectate a running game.
+     *
+     * Joins a game as a spectator (read-only, no fog of war).
+     * The game must have already started (not in lobby phase).
+     *
+     * Path: code [String] The game join code.
+     *
+     * Responses:
+     * - 201 [JoinGameResponse] Spectator connected, returns spectator ID.
+     * - 400 Game has not started yet.
+     * - 404 Game not found.
+     */
+    post("/games/{code}/spectate") {
+        val session = lobby.requireSession(call.requireParam("code"))
+        call.respondResult(
+            session.spectate().map { JoinGameResponse(it.value) },
+            HttpStatusCode.Created,
+        )
+    }
+
+    /**
      * Leave a game.
      *
      * Removes a player from the game lobby. If the last player leaves,

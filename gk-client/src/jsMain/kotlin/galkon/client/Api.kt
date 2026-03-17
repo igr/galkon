@@ -43,6 +43,11 @@ suspend fun apiJoinGame(serverUrl: String, code: String, playerName: String): Jo
     return GameJson.decodeFromString(text)
 }
 
+suspend fun apiSpectateGame(serverUrl: String, code: String): JoinGameResponse {
+    val text = fetchJson("$serverUrl/games/$code/spectate", "POST")
+    return GameJson.decodeFromString(text)
+}
+
 suspend fun apiLeaveGame(serverUrl: String, code: String, playerId: String) {
     fetchJson("$serverUrl/games/$code/leave/$playerId", "POST")
 }

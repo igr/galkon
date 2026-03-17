@@ -12,6 +12,7 @@ data class AppState(
     val gameCode: String = "",
     val playerName: String = "",
     val playerId: String = "",
+    val isSpectator: Boolean = false,
     val gamePhase: String = "lobby",
     val currentTurn: Int = 0,
     val maxTurns: Int = 40,
