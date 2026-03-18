@@ -45,7 +45,14 @@ fun renderGalaxy(state: AppState): HTMLElement {
     for (planet in state.planets) {
         val cx = planet.x * state.spaceWidth + state.spaceWidth / 2
         val cy = planet.y * state.spaceHeight + state.spaceHeight / 2
-        val color = ownerColor(planet.owner)
+        // During battle animation, keep showing the defender's (pre-battle) color
+        // so the outcome isn't spoiled before the animation finishes.
+        val battleEvent = state.battleEvent
+        val color = if (planet.label == battlePlanetLabel && battleEvent.defender != null) {
+            ownerColor(battleEvent.defender!!)
+        } else {
+            ownerColor(planet.owner)
+        }
         val isSelected = planet.label == state.orderFrom || planet.label == state.orderTo
 
         // Battle halo ring
