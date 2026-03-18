@@ -42,14 +42,33 @@ fun renderGalaxy(state: AppState): HTMLElement {
     // Render planets
     val battlePlanetLabel = state.battleEvent?.planet
 
+    // During event playback, collect defender colors for not-yet-shown battle events
+    // so planet colors don't spoil outcomes before the battle animation plays.
+    val pendingBattleDefenders = mutableMapOf<String, kotlinx.serialization.json.JsonElement>()
+    if (state.eventPlaybackIndex < state.turnEvents.size) {
+        val firstVisible = when {
+            state.eventPlaybackIndex < 0 -> 0
+            else -> state.eventPlaybackIndex + 1
+        }
+        for (i in firstVisible until state.turnEvents.size) {
+            val ev = state.turnEvents[i]
+            val evPlanet = ev.planet
+            val evDefender = ev.defender
+            if (ev.type == "battle" && evPlanet != null && evDefender != null) {
+                if (evPlanet !in pendingBattleDefenders) {
+                    pendingBattleDefenders[evPlanet] = evDefender
+                }
+            }
+        }
+    }
+
     for (planet in state.planets) {
         val cx = planet.x * state.spaceWidth + state.spaceWidth / 2
         val cy = planet.y * state.spaceHeight + state.spaceHeight / 2
-        // During battle animation, keep showing the defender's (pre-battle) color
-        // so the outcome isn't spoiled before the animation finishes.
-        val battleEvent = state.battleEvent
-        val color = if (planet.label == battlePlanetLabel && battleEvent.defender != null) {
-            ownerColor(battleEvent.defender!!)
+        // Use defender color for planets with pending or active battle events
+        val pendingDefender = pendingBattleDefenders[planet.label]
+        val color = if (pendingDefender != null) {
+            ownerColor(pendingDefender)
         } else {
             ownerColor(planet.owner)
         }
@@ -60,7 +79,7 @@ fun renderGalaxy(state: AppState): HTMLElement {
             val halo = document.createElementNS(SVG_NS, "circle")
             halo.setAttribute("cx", "$cx")
             halo.setAttribute("cy", "$cy")
-            halo.setAttribute("r", "12")
+            halo.setAttribute("r", "13")
             halo.setAttribute("fill", "none")
             halo.setAttribute("stroke", Colors.WARN)
             halo.setAttribute("stroke-width", "4")
@@ -71,7 +90,7 @@ fun renderGalaxy(state: AppState): HTMLElement {
         val circle = document.createElementNS(SVG_NS, "circle")
         circle.setAttribute("cx", "$cx")
         circle.setAttribute("cy", "$cy")
-        circle.setAttribute("r", "6")
+        circle.setAttribute("r", "7")
         circle.setAttribute("fill", color)
         circle.setAttribute("stroke", if (isSelected) Colors.WHITE else color)
         circle.setAttribute("stroke-width", if (isSelected) "2" else "1")
@@ -81,10 +100,10 @@ fun renderGalaxy(state: AppState): HTMLElement {
         })
         svg.appendChild(circle)
 
-        // Planet label
+        // Planet label (upper half of circle)
         val text = document.createElementNS(SVG_NS, "text")
         text.setAttribute("x", "$cx")
-        text.setAttribute("y", "${cy + 1}")
+        text.setAttribute("y", "${cy - 2}")
         text.setAttribute("text-anchor", "middle")
         text.setAttribute("dominant-baseline", "middle")
         text.setAttribute("fill", Colors.BLACK)
@@ -95,16 +114,17 @@ fun renderGalaxy(state: AppState): HTMLElement {
         text.textContent = planet.label
         svg.appendChild(text)
 
-        // Ship count (below planet)
+        // Ship count (lower half of circle)
         val ships = planet.ships
         if (ships != null) {
             val shipText = document.createElementNS(SVG_NS, "text")
             shipText.setAttribute("x", "$cx")
-            shipText.setAttribute("y", "${cy + 14}")
+            shipText.setAttribute("y", "${cy + 5}")
             shipText.setAttribute("text-anchor", "middle")
-            shipText.setAttribute("fill", color)
-            shipText.setAttribute("font-size", "7")
-            shipText.setAttribute("font-family", "Courier New, monospace")
+            shipText.setAttribute("dominant-baseline", "middle")
+            shipText.setAttribute("fill", Colors.BLACK)
+            shipText.setAttribute("font-size", "6")
+            shipText.setAttribute("font-family", "sans-serif")
             shipText.setAttribute("pointer-events", "none")
             shipText.textContent = "$ships"
             svg.appendChild(shipText)
@@ -120,11 +140,11 @@ fun renderGalaxy(state: AppState): HTMLElement {
             val y1 = fromPlanet.y * state.spaceHeight + state.spaceHeight / 2
             val x2 = toPlanet.x * state.spaceWidth + state.spaceWidth / 2
             val y2 = toPlanet.y * state.spaceHeight + state.spaceHeight / 2
-            val mx = (x1 + x2) / 2
-            val my = (y1 + y2) / 2
-
             val fleetIndex = state.players.indexOfFirst { it.id == fleet.owner }
             val fleetColor = if (fleetIndex >= 0) Colors.PLAYER[fleetIndex % Colors.PLAYER.size] else Colors.NEUTRAL
+
+            val fx = (x1 + x2) / 2
+            val fy = (y1 + y2) / 2
 
             val line = document.createElementNS(SVG_NS, "line")
             line.setAttribute("x1", "$x1")
@@ -137,8 +157,8 @@ fun renderGalaxy(state: AppState): HTMLElement {
             svg.appendChild(line)
 
             val fleetText = document.createElementNS(SVG_NS, "text")
-            fleetText.setAttribute("x", "$mx")
-            fleetText.setAttribute("y", "$my")
+            fleetText.setAttribute("x", "$fx")
+            fleetText.setAttribute("y", "$fy")
             fleetText.setAttribute("text-anchor", "middle")
             fleetText.setAttribute("fill", fleetColor)
             fleetText.setAttribute("font-size", "5")
