@@ -100,10 +100,10 @@ fun renderGalaxy(state: AppState): HTMLElement {
         })
         svg.appendChild(circle)
 
-        // Planet label (upper half of circle)
+        // Planet label (centered)
         val text = document.createElementNS(SVG_NS, "text")
         text.setAttribute("x", "$cx")
-        text.setAttribute("y", "${cy - 2}")
+        text.setAttribute("y", "${cy + 1}")
         text.setAttribute("text-anchor", "middle")
         text.setAttribute("dominant-baseline", "middle")
         text.setAttribute("fill", Colors.BLACK)
@@ -114,16 +114,16 @@ fun renderGalaxy(state: AppState): HTMLElement {
         text.textContent = planet.label
         svg.appendChild(text)
 
-        // Ship count (lower half of circle)
+        // Ship count (right under label, color background with black text)
         val ships = planet.ships
         if (ships != null) {
             val shipText = document.createElementNS(SVG_NS, "text")
             shipText.setAttribute("x", "$cx")
-            shipText.setAttribute("y", "${cy + 5}")
+            shipText.setAttribute("y", "${cy + 6}")
             shipText.setAttribute("text-anchor", "middle")
             shipText.setAttribute("dominant-baseline", "middle")
             shipText.setAttribute("fill", Colors.BLACK)
-            shipText.setAttribute("font-size", "6")
+            shipText.setAttribute("font-size", "5")
             shipText.setAttribute("font-family", "sans-serif")
             shipText.setAttribute("pointer-events", "none")
             shipText.textContent = "$ships"
